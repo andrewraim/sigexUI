@@ -20,6 +20,9 @@ data.ts = sigex.prep(data.ts = dataALL.ts,
 N = ncol(data.ts)
 T = nrow(data.ts)
 
+# The original example seems to take a very long time to fit in sigex.mlefit.
+# If I set order.max to 1, it takes about 3.4 minutes on my laptop.
+
 # Get a starting value for MLE
 # ar.fit = ar.yw(diff(ts(ndc[2:T, ])))
 ar.fit = ar.yw(diff(ts(ndc[2:T, ])), order.max = 1)
@@ -30,10 +33,6 @@ var.out = var.par2pre(par.yw)
 psi.init = as.vector(c(covmat.yw[[1]][2, 1], log(covmat.yw[[2]]), var.out, colMeans(diff(ts(ndc[2:T, ])))) )
 psi.mle = psi.init
 par.mle = sigex.psi2par(psi = psi.mle, mdl = mdl, data.ts = data.ts)
-
-# Does the original example really take so long to fit? Or is it something
-# I'm doing wrong? Try a smaller order...
-# p.order = 1
 
 # Set up a model
 mdl = NULL
@@ -50,13 +49,18 @@ mdl = sigex.meaninit(mdl = mdl, data.ts = data.ts, d = 0)
 ## - There should be a default for params that's something like "zero"
 ## - Constraint should be null by default. Create a get_constraint
 ##   function that gives a valid constraint data structure.
+## - I want to be able to print the model object and have it display
+##   all the added components.
 
+st = Sys.time()
 fit.mle = sigex.mlefit(data.ts = data.ts,
   param = par.mle,
   constraint = NULL,
   mdl = mdl,
   method = "bfgs",
   debug = TRUE)
+et = Sys.time()
+et - st
 
 # Notes about sigex
 # Instead of debug, maybe let user change "trace" option in optim
