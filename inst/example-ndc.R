@@ -25,14 +25,26 @@ T = nrow(data.ts)
 
 # Get a starting value for MLE
 # ar.fit = ar.yw(diff(ts(ndc[2:T, ])))
-ar.fit = ar.yw(diff(ts(ndc[2:T, ])), order.max = 1)
+order.max = 1
+ar.fit = ar.yw(diff(ts(ndc[2:T, ])), order.max = order.max)
 p.order = ar.fit$order
 par.yw = aperm(ar.fit$ar, c(2, 3, 1))
 covmat.yw = getGCD(ar.fit$var.pred, 2)
 var.out = var.par2pre(par.yw)
 psi.init = as.vector(c(covmat.yw[[1]][2, 1], log(covmat.yw[[2]]), var.out, colMeans(diff(ts(ndc[2:T, ])))) )
-psi.mle = psi.init
-par.mle = sigex.psi2par(psi = psi.mle, mdl = mdl, data.ts = data.ts)
+
+get_par = function() {
+  # par is a list of four things...
+  # 4. Regression parameters?
+
+  list(beta = beta)
+}
+
+ar2par = function(object, rank) {
+  stopifnot(class(object) == "ar")
+  par = aperm(object$ar, c(2, 3, 1))
+  covmat = getGCD(object$var.pred, rank)
+}
 
 # Set up a model
 mdl = NULL
@@ -45,6 +57,23 @@ mdl = sigex.add(mdl = mdl,
   delta = c(1,-1) )
 mdl = sigex.meaninit(mdl = mdl, data.ts = data.ts, d = 0)
 
+## I think that last mysterious colMeans term of psi.init above is related to the
+## sigex.meaninit call above. It looks like the colMeans result is directly used
+## as the last two entries of par.init next.
+
+## We should make a sigex model with its own type and named attributes
+
+## Let's make a little document for the data structures we need to understand:
+## - mdl
+## - par
+## - psi
+## - pre
+## - gcd
+## - mlefit
+## - momfit
+
+par.init = sigex.psi2par(psi = psi.init, mdl = mdl, data.ts = data.ts)
+
 ## TBD for Andrew
 ## - There should be a default for params that's something like "zero"
 ## - Constraint should be null by default. Create a get_constraint
@@ -54,13 +83,13 @@ mdl = sigex.meaninit(mdl = mdl, data.ts = data.ts, d = 0)
 
 st = Sys.time()
 fit.mle = sigex.mlefit(data.ts = data.ts,
-  param = par.mle,
+  param = par.init,
   constraint = NULL,
   mdl = mdl,
   method = "bfgs",
   debug = TRUE)
 et = Sys.time()
-et - st
+as.numeric(et - st, units = "secs")
 
 # Notes about sigex
 # Instead of debug, maybe let user change "trace" option in optim
