@@ -33,13 +33,6 @@ covmat.yw = getGCD(ar.fit$var.pred, 2)
 var.out = var.par2pre(par.yw)
 psi.init = as.vector(c(covmat.yw[[1]][2, 1], log(covmat.yw[[2]]), var.out, colMeans(diff(ts(ndc[2:T, ])))) )
 
-get_par = function() {
-  # par is a list of four things...
-  # 4. Regression parameters?
-
-  list(beta = beta)
-}
-
 ar2par = function(object, rank) {
   stopifnot(class(object) == "ar")
   par = aperm(object$ar, c(2, 3, 1))
