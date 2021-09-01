@@ -1,0 +1,64 @@
+---
+title: Notes on sigexUI Development
+author: Andrew
+---
+
+# Introduction
+These are transient notes while working on the interface.
+
+Some book chapters on S3, S4, R6 programming are here:
+<https://adv-r.hadley.nz/oo.html>
+
+# Some things to consider sooner
+
+1. Want something that will make model building easier and little more
+  regimented.
+	a. Not sure if this means SigexModel and SigexModelComponent classes, an
+	   AddSigexComponent method, etc.
+	a. SigexModelComponents might be almost redundant with SigexParams. Make
+	   sure to avoid too unnecessary redundancy. Also, maybe we don't need some
+	   of the model metadata now that its in the parameters.
+	a. It would be nice to be able to use the `%>%` operator to compose multiple
+	   components.
+	a. Want to be able to print a model and see a summary of all the added
+	   components.
+
+1. For the MLE and MOM functions, there should either be a default initial
+  parameter like "zero", or at least an easy way to create one that doesn't
+  require too much thinking.
+
+1. For constructing SigexParam objects
+	a. Want something to convert the output of `ar.yw` and related functions to
+	   a valid SigexParam. Even though it only saves one `aperm` call, I think
+	   it's better to shield users from the internal data format.
+
+1. For SigexParamTS
+	a. Do we still need the `model_class` slot? It's easy to ask an S4 object
+	   what its type is, but sigex might need this.
+
+# Some things to consider later
+
+1. There are a number of places where a default value would be reasonable, and
+   an argument is only needed sometimes. For example, the `constraint` argument
+   of the MLE function.
+
+1. Some potential suggestions for sigex
+	a. The MLE function takes a long time. The vast majority of time seems to be
+	   spent in `mvar.midcast`. I wonder if the performance can be improved,
+	   e.g. by writing it in C++, but this looks like it would be an involved
+	   effort.
+	a. For the MLE function, it would be useful to let the user pass a control
+	   object for the optimizer. This would let users set the trace level, for
+	   example, so that the `debug` flag (which seems to print the likelihood
+	   value each time it's computed) may not be necessary.
+	a. Some functions appear to take arguments that should not be necessary. For
+	   example, `sigex.psi2par` takes a dataset, but data should not be needed
+	   to transform the parameters to another representation.
+	a. Many places in sigex return lists that would benefit from labels. An
+	   example of this is `getGCD`. The first element of the return value could
+	   be labeled `L` and the second element could be labeled `D` or `D_vec`.
+	   This would help with readability and maintainability of the code.
+
+1. Make sure S4 is being used properly within a package
+	a. Exported correctly?
+	a. Roxygen?

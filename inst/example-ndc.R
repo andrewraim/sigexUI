@@ -1,5 +1,8 @@
 library(methods)
 library(sigex)
+library(dplyr)
+
+# ----- Example using existing sigex interface -----
 
 # Make a ts object with the built-in ts function
 dataALL.ts = ts(data = ndc,
@@ -51,29 +54,11 @@ mdl = sigex.add(mdl = mdl,
 	delta = c(1,-1) )
 mdl = sigex.meaninit(mdl = mdl, data.ts = data.ts, d = 0)
 
-## I think that last mysterious colMeans term of psi.init above is related to the
+## I think that last  colMeans term of psi.init above is related to the
 ## sigex.meaninit call above. It looks like the colMeans result is directly used
 ## as the last two entries of par.init next.
 
-## We should make a sigex model with its own type and named attributes
-
-## Let's make a little document for the data structures we need to understand:
-## - mdl
-## - par
-## - psi
-## - pre
-## - gcd
-## - mlefit
-## - momfit
-
 par.init = sigex.psi2par(psi = psi.init, mdl = mdl, data.ts = data.ts)
-
-## TBD for Andrew
-## - There should be a default for params that's something like "zero"
-## - Constraint should be null by default. Create a get_constraint
-##	 function that gives a valid constraint data structure.
-## - I want to be able to print the model object and have it display
-##	 all the added components.
 
 st = Sys.time()
 fit.mle = sigex.mlefit(data.ts = data.ts,
@@ -85,16 +70,12 @@ fit.mle = sigex.mlefit(data.ts = data.ts,
 et = Sys.time()
 as.numeric(et - st, units = "secs")
 
-# Notes about sigex
-# Instead of debug, maybe let user change "trace" option in optim
-# In sigex.psi2par and related functions, can we avoid needing a dataset and just take dimensions?
-# Maybe sigex could use named lists to help make the interface more intuitive
-
 psi.mle = sigex.eta2psi(eta = fit.mle[[1]]$par, constraint = constraint)
 hess = fit.mle[[1]]$hessian
 par.mle = fit.mle[[2]]
 
 # ----- Experimental S4 interface -----
+# An S4 SigexConstraint
 constraint = SigexConstraint(A = diag(3), b = numeric(3))
 
 gcd = GCD(L = covmat.yw[[1]], D_vec = covmat.yw[[2]])
@@ -109,17 +90,41 @@ param = SigexParam(gcd_list = list(gcd), ts_param_list = list(varma_par), reg_pa
 object = param
 show(param)
 
-# What to do next
-# - Make sure package is set up properly to export S4 classes
-# - Can we make something that converts the output of ar.yw and related functions
-#   into our format without too much work and without overengineeering things?
-# - SigexParamTS may not need model_class anymore. It's easy to ask an S4 object
-#   what its type is.
-# - Give the public classes a Sigex prefix?
-# - Add some simple classes for SigexModelComponent's. These might be fairly
-#   redundant with he Parameter objects... maybe we don't need some of the model
-#   metadata now that its in the parameters?
-# - Maybe we can use the %>% operator with SigexModelComponent objects! Try to
-#   make a version of sigex.add that takes those objects, and then try %>%.
+mdl = sigex.add(mdl = mdl,
+	vrank = seq(1,N),
+	class = "varma",
+	order = c(p.order,0),
+	bounds = NULL,
+	name = "process",
+	delta = c(1,-1) )
 
+# Basically I want to be able to do something like this
+model = SigexModel()
+add(model, SigexModelComponent())
+add(model, SigexModelComponent())
 
+# Then we could hopefully compose the calls like this
+model = SigexModel() %>%
+	add(SigexModelComponent()) %>%
+	add(SigexModelComponent())
+
+# SigexModelComponent is like an abstract class though. Really there are ARMA
+# components, VARMA components, etc
+
+# Some of the other arguments of sigex.add belong in our add() and not in the
+# components. I think delta, name, and vrank are all like this.
+
+# Since we're just a UI right now, SigexModel should ultiimately just have a
+# sigex mdl inside. Our add operations just call sigex.add.
+
+# Default for vrank can be seq(1,N) I think
+# Default for name can be determined by a counter: component1
+# Default for delta could be 0, but maybe this is something we want specified?
+model = SigexModel()
+comp1 = SigexModelComponentVARMA(p = 2, q = 2)
+model2 = add(model, comp1, name = "process", vrank = seq(1,N), delta = c(1,-1), bounds = c(1,2,3,4))
+
+model = SigexModel() %>%
+	add(SigexModelComponentVARMA(p = 2, q = 2, epithet = "process"), vrank = seq(1,N), delta = c(1,-1), bounds = c(1,2,3,4)) %>%
+	add(SigexModelComponentVARMA(p = 0, q = 0, epithet = "wn"), vrank = seq(1,N), delta = c(1,-1), bounds = c(1,2,3,4))
+model@mdl

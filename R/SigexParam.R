@@ -1,21 +1,3 @@
-# A SigexParam has three things:
-# 1. A list of K GCDs
-# 2. The time series parameters whose exact form depends on the class of this latent process
-# 3. Regression parameters
-#' @export
-setClass("SigexParam",
-	slots = c(
-		gcd_list = "list",
-		ts_param_list = "list",
-		reg_param = "numeric"
-	),#
-	prototype = list(
-	#	gcd_list = list(),
-	#	ts_param_list = NA_real_,
-		reg_param = NA_real_
-	)
-)
-
 #' @export
 setValidity("SigexParam", function(object) {
 	# TBD: Do some checking
@@ -39,7 +21,7 @@ setMethod("show", "SigexParam", function(object) {
 
 	printf("--- Components of TS parameter list ---\n")
 	for (k in 1:K) {
-		lab = modelname(object@ts_param_list[[k]])
+		lab = modelclass(object@ts_param_list[[k]])
 		printf("%d: %s\n", k, lab)
 	}
 	printf("\n")
