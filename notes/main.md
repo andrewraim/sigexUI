@@ -1,6 +1,9 @@
 ---
 title: Notes on sigexUI Development
 author: Andrew
+output:
+  html_document:
+    number_sections: true
 ---
 
 # Introduction
@@ -9,19 +12,24 @@ These are transient notes while working on the interface.
 Some book chapters on S3, S4, R6 programming are here:
 <https://adv-r.hadley.nz/oo.html>
 
-# Some things to consider sooner
+# What we have so far
 
-1. Want something that will make model building easier and little more
-  regimented.
+1. Classes for building parameters whose structure is appropriate for the
+   desired type of model.
+
+1. Classes for building a model.
 	a. Not sure if this means SigexModel and SigexModelComponent classes, an
 	   AddSigexComponent method, etc.
 	a. SigexModelComponents might be almost redundant with SigexParams. Make
 	   sure to avoid too unnecessary redundancy. Also, maybe we don't need some
 	   of the model metadata now that its in the parameters.
-	a. It would be nice to be able to use the `%>%` operator to compose multiple
-	   components.
-	a. Want to be able to print a model and see a summary of all the added
-	   components.
+	a. Use the `%>%` operator to compose multiple components.
+	a. Print a model and see a summary of all the added components.
+
+# Some things to consider next
+
+1. Make reasonable defaults for arguments in S4 methods which will only be
+   needed occasionally.
 
 1. For the MLE and MOM functions, there should either be a default initial
   parameter like "zero", or at least an easy way to create one that doesn't
@@ -37,10 +45,6 @@ Some book chapters on S3, S4, R6 programming are here:
 	   what its type is, but sigex might need this.
 
 # Some things to consider later
-
-1. There are a number of places where a default value would be reasonable, and
-   an argument is only needed sometimes. For example, the `constraint` argument
-   of the MLE function.
 
 1. Some potential suggestions for sigex
 	a. The MLE function takes a long time. The vast majority of time seems to be
