@@ -19,6 +19,11 @@ setValidity("SigexParamVARMA", function(object) {
 })
 
 #' @export
+SigexParamVARMA = function(ar, ma) {
+	new("SigexParamVARMA", ar = ar, ma = ma)
+}
+
+#' @export
 setMethod("modelClass", "SigexParamVARMA", function(object) {
 	p = dim(object@ar)[3]
 	q = dim(object@ma)[3]
@@ -39,6 +44,9 @@ setMethod("show", "SigexParamVARMA", function(object) {
 })
 
 #' @export
-SigexParamVARMA = function(ar, ma) {
-	varma_par = new("SigexParamVARMA", ar = ar, ma = ma)
-}
+setMethod("asSigexParamVARMA", c(object = "ar"), function(object) {
+	ar_hat = aperm(object$ar, c(2, 3, 1))
+	N = dim(ar_hat)[1]
+	p = object$order
+	SigexParamVARMA(ar = ar_hat, ma = array(0, dim = c(N,N,0)))
+})

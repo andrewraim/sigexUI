@@ -29,22 +29,13 @@ A guide to S4 classes and methods:
 	a. Use the `%>%` operator to compose multiple components.
 	a. Print a model and see a summary of all the added components.
 
+1. Converting ar outputs to SigexParam objects
+
 # Some things to consider next
-
-1. Make reasonable defaults for arguments in S4 methods which will only be
-   needed occasionally.
-
-	a. Is there a way to infer `vranks` from other arguments when building up
-	   a SigexModel?
 
 1. For the MLE and MOM functions, there should either be a default initial
   parameter like "zero", or at least an easy way to create one that doesn't
   require too much thinking.
-
-1. For constructing SigexParam objects
-	a. Want something to convert the output of `ar.yw` and related functions to
-	   a valid SigexParam. Even though it only saves one `aperm` call, I think
-	   it's better to shield users from the internal data format.
 
 1. For SigexParamTS
 	a. Do we still need the `model_class` slot? It's easy to ask an S4 object

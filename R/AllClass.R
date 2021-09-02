@@ -1,3 +1,7 @@
+# Convert the output of ar to an S4 class. Ideally, we should not be doing this
+# because we aren't the owners.
+setOldClass("ar")
+
 # This is an abstract base class
 #' @export
 setClass("SigexModelComponent",
@@ -53,6 +57,13 @@ setClass("SigexParam",
 	#	ts_param_list = NA_real_,
 		reg_param = NA_real_
 	)
+)
+
+#' @export
+setClass("SigexParamARMA",
+	contains = "SigexParamTS",
+	slots = c(ar = "numeric", ma = "numeric"),
+	prototype = list(model_class = "ARMA")
 )
 
 #' @export

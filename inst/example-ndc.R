@@ -29,7 +29,8 @@ T = nrow(data.ts)
 
 # Get a starting value for MLE
 # ar.fit = ar.yw(diff(ts(ndc[2:T, ])))
-order.max = 1
+# order.max = 1
+order.max = 10
 ar.fit = ar.yw(diff(ts(ndc[2:T, ])), order.max = order.max)
 p.order = ar.fit$order
 par.yw = aperm(ar.fit$ar, c(2, 3, 1))
@@ -157,3 +158,11 @@ model@mdl
 epithet(model@components[[1]])
 delta(model@components[[1]])
 modelClass(model@components[[1]])
+
+# Some converters from ar objects
+var_out = ar.yw(diff(ts(ndc[2:T,])), order.max = 7, aic = FALSE)
+asSigexParamVARMA(var_out)
+
+ar_out = ar.yw(diff(ts(ndc[2:T,1])), order.max = 7, aic = FALSE)
+asSigexParamARMA(ar_out)
+
