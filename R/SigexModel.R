@@ -1,52 +1,81 @@
 #' @export
-SigexModel = function() {
-	new("SigexModel")
+SigexModel = function(N) {
+	N = as.integer(N)
+	new("SigexModel", N = N, mdl = list(), components = list())
 }
 
 #' @export
+setValidity("SigexModel", function(object) {
+	if (object@N < 0) {
+		stop(sprintf("N = %d is not a valid dimension for series", N))
+	}
+
+	return(TRUE)
+})
+
+#' @export
 setMethod("show", "SigexModel", function(object) {
-	L = length(object@components)
-	printf("SigexModel with %d component(s)\n", L)
-	for (l in seq_len(L)) {
-		comp_class = modelclass(object@components[[l]])
-		comp_ep = epithet(object@components[[l]])
-		if (comp_ep == "NULL") {
-			printf("%d) %s\n", l, comp_class)
-		} else {
-			printf("%d) %s with epithet %s\n", l, comp_class, comp_ep)
-		}
+	N = object@N
+	K = length(object@components)
+	printf("SigexModel for %d-dimensional series with %d component(s)\n", N, K)
+	for (k in seq_len(K)) {
+		printf("%d) ", k)
+		show(object@components[[k]])
 	}
 	return(invisible(NULL))
 })
 
+# TBD: Most of the add method code would be pretty similar for other kinds of
+# time series models. Do we want to try to improve that? E.g., I think all
+# types of components could provide a vector of orders that are meaningful to
+# themselves, and that would solve the problem.
+
+# TBD: Should vrank and bounds also be members of SigexComponents? If they were,
+# one benefit would be that it would be easier to print them in the show method.
+
+# Below, object and component are required arguments. vrank and bounds may be
+# omitted; if they are, we will try to put something reasonable there.
+
 #' @export
 setMethod("add",
-	c("SigexModel", "SigexModelComponentVARMA", "numeric", "integer", "numeric"),
-	function(object, component, delta, vrank, bounds = NULL) {
+	c(object = "SigexModel", component = "SigexModelComponent", vrank = "ANY", bounds = "ANY"),
+	function(object, component, vrank, bounds) {
+		# Set a default value for vrank if missing
+		if (missing(vrank)) {
+			vrank = seq(1, object@N)
+		}
+		stopifnot(is.numeric(vrank))
+		stopifnot(all(vrank %in% 1:object@N))
+
+		# Set a default value for bounds if missing
+		if (missing(bounds)) {
+			bounds = c(-Inf, Inf, -Inf, Inf)
+		}
+
+		stopifnot(is.numeric(bounds))
+		stopifnot(length(bounds) == 4)
+		if (bounds[1] >= bounds[2]) {
+			stop("Require bounds[1] < bounds[2]")
+		}
+		if (bounds[3] >= bounds[4]) {
+			stop("Require bounds[3] < bounds[4]")
+		}
+
 		# Add component to internal mdl structure
-		order = c(component@p, component@q)
-		object@mdl = sigex.add(object@mdl, vrank, "varma", order, bounds, component@epithet, delta)
+		K = length(object@components)
+		order = orderVector(component)
+		if (K == 0) {
+			# If mdl slot is an empty list, pass NULL instead as the initial model
+			object@mdl = sigex.add(NULL, vrank, component@model_class, order,
+				bounds, component@epithet, delta)
+		} else {
+			object@mdl = sigex.add(object@mdl, vrank, component@model_class,
+				order, bounds, component@epithet, delta)
+		}
 
 		# Add description of component to list
-		L = length(object@components)
-		object@components[[L + 1]] = component
+		object@components[[K + 1]] = component
 
 		invisible(object)
 	}
 )
-
-# ' @export
-#setValidity("GCD", function(object) {
-#	if (nrow(object@L) != ncol(object@L)) {
-#		return("@L must be a square matrix")
-#	}
-#	if (nrow(object@L) != length(object@D_vec)) {
-#		return("@L and @D_vec must have compatible dimensions")
-#	}
-#	return(TRUE)
-#})
-
-# ' @export
-#setMethod("dim", "GCD", function(x) {
-#	dim(x@L)
-#})

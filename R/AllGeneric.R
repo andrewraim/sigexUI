@@ -2,7 +2,13 @@
 setGeneric("epithet", function(object) standardGeneric("epithet"))
 
 #' @export
-setGeneric("modelclass", function(object) standardGeneric("modelclass"))
+setGeneric("modelClass", function(object) standardGeneric("modelClass"))
+
+#' @export
+setGeneric("delta", function(object) standardGeneric("delta"))
+
+#' @export
+setGeneric("orderVector", function(object) standardGeneric("orderVector"))
 
 # The add method is a method only of SigexModel. I like the idea of having it
 # be a method instead of a function, since types are checked without having to
@@ -10,5 +16,5 @@ setGeneric("modelclass", function(object) standardGeneric("modelclass"))
 # but do not export the generic outside of the package.
 # <https://stat.ethz.ch/R-manual/R-devel/library/methods/html/Methods_for_Nongenerics.html>
 # ' @export
-setGeneric("add", function(object, component, delta, vrank, bounds) standardGeneric("add"))
+setGeneric("add", function(object, component, vrank, bounds) standardGeneric("add"))
 

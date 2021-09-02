@@ -15,7 +15,7 @@ setValidity("SigexParamARMA", function(object) {
 })
 
 #' @export
-setMethod("modelclass", "SigexParamARMA", function(object) {
+setMethod("modelClass", "SigexParamARMA", function(object) {
 	p = ncol(object@ar)
 	q = ncol(object@ma)
 	sprintf("ARMA(%d,%d)", p, q)

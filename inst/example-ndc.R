@@ -127,24 +127,6 @@ param = SigexParam(gcd_list = list(gcd), ts_param_list = list(varma_par), reg_pa
 object = param
 show(param)
 
-mdl = sigex.add(mdl = mdl,
-	vrank = seq(1,N),
-	class = "varma",
-	order = c(p.order,0),
-	bounds = NULL,
-	name = "process",
-	delta = c(1,-1) )
-
-# Basically I want to be able to do something like this
-model = SigexModel()
-add(model, SigexModelComponent())
-add(model, SigexModelComponent())
-
-# Then we could hopefully compose the calls like this
-model = SigexModel() %>%
-	add(SigexModelComponent()) %>%
-	add(SigexModelComponent())
-
 # SigexModelComponent is like an abstract class though. Really there are ARMA
 # components, VARMA components, etc
 
@@ -157,11 +139,21 @@ model = SigexModel() %>%
 # Default for vrank can be seq(1,N) I think
 # Default for name can be determined by a counter: component1
 # Default for delta could be 0, but maybe this is something we want specified?
-model = SigexModel()
+model = SigexModel(N)
 comp1 = SigexModelComponentVARMA(p = 2, q = 2)
-model2 = add(model, comp1, name = "process", vrank = seq(1,N), delta = c(1,-1), bounds = c(1,2,3,4))
+comp2 = SigexModelComponentVARMA(p = 2, q = 2, epithet = "process", delta = c(-1,1))
 
-model = SigexModel() %>%
-	add(SigexModelComponentVARMA(p = 2, q = 2, epithet = "process"), vrank = seq(1,N), delta = c(1,-1), bounds = c(1,2,3,4)) %>%
-	add(SigexModelComponentVARMA(p = 0, q = 0, epithet = "wn"), vrank = seq(1,N), delta = c(1,-1), bounds = c(1,2,3,4))
+model1 = add(model, comp1)
+model2 = add(model, comp1, vrank = 1:N)
+model3 = add(model, comp1, bounds = c(1,2,3,4))
+model4 = add(model, comp1, vrank = 1:N, bounds = c(1,2,3,4))
+
+model = SigexModel(N) %>%
+	add(SigexModelComponentVARMA(p = 2, q = 2, epithet = "process", delta = c(1,-1))) %>%
+	add(SigexModelComponentVARMA(p = 0, q = 0, epithet = "irregular", delta = c(1)))
+model
 model@mdl
+
+epithet(model@components[[1]])
+delta(model@components[[1]])
+modelClass(model@components[[1]])

@@ -17,11 +17,10 @@ setMethod("show", "SigexParam", function(object) {
 
 	printf("--- Components of GCD list ---\n")
 	print(object@gcd_list)
-	printf("\n")
 
 	printf("--- Components of TS parameter list ---\n")
 	for (k in 1:K) {
-		lab = modelclass(object@ts_param_list[[k]])
+		lab = modelClass(object@ts_param_list[[k]])
 		printf("%d: %s\n", k, lab)
 	}
 	printf("\n")

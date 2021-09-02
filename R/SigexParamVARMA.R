@@ -19,7 +19,7 @@ setValidity("SigexParamVARMA", function(object) {
 })
 
 #' @export
-setMethod("modelclass", "SigexParamVARMA", function(object) {
+setMethod("modelClass", "SigexParamVARMA", function(object) {
 	p = dim(object@ar)[3]
 	q = dim(object@ma)[3]
 	sprintf("VARMA(%d,%d)", p, q)

@@ -10,16 +10,16 @@ setValidity("SigexModelComponentVARMA", function(object) {
 })
 
 #' @export
-SigexModelComponentVARMA = function(p, q, epithet = "NULL") {
-	new("SigexModelComponentVARMA", p = p, q = q, epithet = "NULL")
+SigexModelComponentVARMA = function(p, q, delta = 1, epithet = "NULL") {
+	new("SigexModelComponentVARMA", p = p, q = q, delta = delta, epithet = epithet)
 }
 
 #' @export
-setMethod("modelclass", "SigexModelComponentVARMA", function(object) {
+setMethod("modelClass", "SigexModelComponentVARMA", function(object) {
 	sprintf("VARMA(%d,%d)", object@p, object@q)
 })
 
-# ' @export
-setMethod("show", "SigexModelComponentVARMA", function(object) {
-	printf("SigexModelComponent for %s\n", modelname(object))
+#' @export
+setMethod("orderVector", "SigexModelComponent", function(object) {
+	c(object@p, object@q)
 })

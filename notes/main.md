@@ -12,6 +12,9 @@ These are transient notes while working on the interface.
 Some book chapters on S3, S4, R6 programming are here:
 <https://adv-r.hadley.nz/oo.html>
 
+A guide to S4 classes and methods:
+<https://bioconductor.org/help/course-materials/2017/Zurich/S4-classes-and-methods.html>
+
 # What we have so far
 
 1. Classes for building parameters whose structure is appropriate for the
@@ -30,6 +33,9 @@ Some book chapters on S3, S4, R6 programming are here:
 
 1. Make reasonable defaults for arguments in S4 methods which will only be
    needed occasionally.
+
+	a. Is there a way to infer `vranks` from other arguments when building up
+	   a SigexModel?
 
 1. For the MLE and MOM functions, there should either be a default initial
   parameter like "zero", or at least an easy way to create one that doesn't

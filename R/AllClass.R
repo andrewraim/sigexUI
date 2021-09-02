@@ -1,17 +1,19 @@
 # This is an abstract base class
-
 #' @export
 setClass("SigexModelComponent",
 	slots = c(
 		model_class = "character",
+		delta = "numeric",
 		epithet = "character"
 	),
 	prototype = list(
 		model_class = "NULL",
+		delta = NULL,
 		epithet = "NULL"
 	)
 )
 
+# This class inherits from SigexModelComponent
 #' @export
 setClass("SigexModelComponentVARMA",
 	contains = "SigexModelComponent",
@@ -63,10 +65,12 @@ setClass("SigexParamVARMA",
 #' @export
 setClass("SigexModel",
 	slots = c(
+		N = "integer",
 		mdl = "list",
 		components = "list"
 	),
 	prototype = list(
+		N = NA_integer_,
 		mdl = NULL,
 		components = list()
 	)
