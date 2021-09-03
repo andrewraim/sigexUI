@@ -1,6 +1,6 @@
 library(methods)
 library(sigex)
-library(dplyr)
+library(magrittr)
 
 # ----- Example using existing sigex interface -----
 
@@ -37,12 +37,6 @@ par.yw = aperm(ar.fit$ar, c(2, 3, 1))
 covmat.yw = getGCD(ar.fit$var.pred, 2)
 var.out = var.par2pre(par.yw)
 psi.init = as.vector(c(covmat.yw[[1]][2, 1], log(covmat.yw[[2]]), var.out, colMeans(diff(ts(ndc[2:T, ])))) )
-
-ar2par = function(object, rank) {
-	stopifnot(class(object) == "ar")
-	par = aperm(object$ar, c(2, 3, 1))
-	covmat = getGCD(object$var.pred, rank)
-}
 
 # Set up a model
 mdl = NULL
@@ -117,41 +111,23 @@ par.mle = fit.mle[[2]]
 constraint = SigexConstraint(A = diag(3), b = numeric(3))
 
 gcd = GCD(L = covmat.yw[[1]], D_vec = covmat.yw[[2]])
-# ts_param = new("SigexParamTS")
-# arma_par = new("SigexParamARMA", ar = par.yw[,,1], ma = par.yw[,,1])
-# varma_par = new("SigexParamVARMA", ar = par.yw, ma = par.yw)
-varma_par = SigexParamVARMA(ar = par.yw, ma = par.yw)
 beta = colMeans(diff(ts(ndc[2:T,])))
-show(gcd)
 
-param = SigexParam(gcd_list = list(gcd), ts_param_list = list(varma_par), reg_param = beta)
-object = param
-show(param)
+param = SigexParam(N) %>%
+  addParam(SigexParamVARMA(ar = par.yw, ma = par.yw), gcd) %>%
+  addParam(SigexParamVARMA(ar = par.yw, ma = par.yw), ar.fit$var.pred) %>%
+  addParam(SigexParamVARMA(ar = par.yw, ma = par.yw), ar.fit$var.pred, rank = 2) %>%
+  setRegParam(beta = beta)
+print(param)
 
 # SigexModelComponent is like an abstract class though. Really there are ARMA
 # components, VARMA components, etc
 
-# Some of the other arguments of sigex.add belong in our add() and not in the
-# components. I think delta, name, and vrank are all like this.
-
-# Since we're just a UI right now, SigexModel should ultiimately just have a
-# sigex mdl inside. Our add operations just call sigex.add.
-
-# Default for vrank can be seq(1,N) I think
-# Default for name can be determined by a counter: component1
-# Default for delta could be 0, but maybe this is something we want specified?
-model = SigexModel(N)
-comp1 = SigexModelComponentVARMA(p = 2, q = 2)
-comp2 = SigexModelComponentVARMA(p = 2, q = 2, epithet = "process", delta = c(-1,1))
-
-model1 = add(model, comp1)
-model2 = add(model, comp1, vrank = 1:N)
-model3 = add(model, comp1, bounds = c(1,2,3,4))
-model4 = add(model, comp1, vrank = 1:N, bounds = c(1,2,3,4))
 
 model = SigexModel(N) %>%
-	add(SigexModelComponentVARMA(p = 2, q = 2, epithet = "process", delta = c(1,-1))) %>%
-	add(SigexModelComponentVARMA(p = 0, q = 0, epithet = "irregular", delta = c(1)))
+	addComponent(SigexModelComponentVARMA(p = 2, q = 2, epithet = "process", delta = c(1,-1))) %>%
+	addComponent(SigexModelComponentVARMA(p = 0, q = 0, epithet = "irregular", delta = c(1))) %>%
+  setRegComponent(data.ts, d = 0)
 model
 model@mdl
 

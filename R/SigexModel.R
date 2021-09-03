@@ -22,6 +22,9 @@ setMethod("show", "SigexModel", function(object) {
 		printf("%d) ", k)
 		show(object@components[[k]])
 	}
+	if (!is.null(model@mdl$regress)) {
+		printf("Regression model is set\n")
+	}
 	return(invisible(NULL))
 })
 
@@ -37,7 +40,7 @@ setMethod("show", "SigexModel", function(object) {
 # omitted; if they are, we will try to put something reasonable there.
 
 #' @export
-setMethod("add",
+setMethod("addComponent",
 	c(object = "SigexModel", component = "SigexModelComponent", vrank = "ANY", bounds = "ANY"),
 	function(object, component, vrank, bounds) {
 		# Set a default value for vrank if missing
@@ -67,10 +70,10 @@ setMethod("add",
 		if (K == 0) {
 			# If mdl slot is an empty list, pass NULL instead as the initial model
 			object@mdl = sigex.add(NULL, vrank, component@model_class, order,
-				bounds, component@epithet, delta)
+				bounds, component@epithet, component@delta)
 		} else {
 			object@mdl = sigex.add(object@mdl, vrank, component@model_class,
-				order, bounds, component@epithet, delta)
+				order, bounds, component@epithet, component@delta)
 		}
 
 		# Add description of component to list
@@ -79,3 +82,13 @@ setMethod("add",
 		invisible(object)
 	}
 )
+
+#' @export
+setMethod("setRegComponent",
+	c(object = "SigexModel", data_ts = "ts", d = "numeric"),
+	function(object, data_ts, d) {
+		object@mdl = sigex.meaninit(object@mdl, data.ts = data_ts, d = d)
+		invisible(object)
+	}
+)
+

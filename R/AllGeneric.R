@@ -22,5 +22,9 @@ setGeneric("asSigexParamVARMA", function(object) standardGeneric("asSigexParamVA
 # but do not export the generic outside of the package.
 # <https://stat.ethz.ch/R-manual/R-devel/library/methods/html/Methods_for_Nongenerics.html>
 # ' @export
-setGeneric("add", function(object, component, vrank, bounds) standardGeneric("add"))
+setGeneric("addComponent", function(object, component, vrank, bounds) standardGeneric("addComponent"))
+setGeneric("setRegComponent", function(object, data_ts, d) standardGeneric("setRegComponent"))
 
+# These are specifically for adding time series parameters to a SigexParam object
+setGeneric("addParam", function(object, ts_param, Sigma, rank) standardGeneric("addParam"))
+setGeneric("setRegParam", function(object, beta) standardGeneric("setRegParam"))

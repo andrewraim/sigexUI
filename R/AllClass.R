@@ -48,11 +48,13 @@ setClass("SigexParamTS",
 #' @export
 setClass("SigexParam",
 	slots = c(
-		gcd_list = "list",
-		ts_param_list = "list",
+		N = "integer",
+		gcds = "list",
+		ts_params = "list",
 		reg_param = "numeric"
 	),#
 	prototype = list(
+		N = NA_integer_,
 	#	gcd_list = list(),
 	#	ts_param_list = NA_real_,
 		reg_param = NA_real_
