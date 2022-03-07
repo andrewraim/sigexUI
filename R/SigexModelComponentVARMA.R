@@ -20,6 +20,6 @@ setMethod("modelClass", "SigexModelComponentVARMA", function(object) {
 })
 
 #' @export
-setMethod("orderVector", "SigexModelComponent", function(object) {
+setMethod("orderVector", "SigexModelComponentVARMA", function(object) {
 	c(object@p, object@q)
 })
