@@ -73,3 +73,32 @@ setMethod("setRegParam",
 		invisible(object)
 	}
 )
+
+
+
+#' @export
+setMethod("to_sigex",
+	c(object = "SigexParam"),
+	function(object) {
+		out <- vector(mode = 'list', length = 4)
+
+		K = length(object@gcds)
+
+		out[[1]] = list() # the L of LDL' decomp
+		out[[2]] = list() # the diag of D in LDL' decomp
+		for (k in seq_len(K)) {
+			out[[1]][[k]] = object@gcds[[k]]@L
+			out[[2]][[k]] = object@gcds[[k]]@D_vec
+		}
+
+		out[[3]] = list() # the time series comps
+		for (k in seq_len(K)) {
+			out[[3]][[k]] = to_sigex(object@ts_params[[k]])
+		}
+
+		out[[4]] = object@reg_param # vector of regression params
+
+		return(out)
+	}
+)
+

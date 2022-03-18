@@ -28,3 +28,6 @@ setGeneric("setRegComponent", function(object, data_ts, d) standardGeneric("setR
 # These are specifically for adding time series parameters to a SigexParam object
 setGeneric("addParam", function(object, ts_param, Sigma, rank) standardGeneric("addParam"))
 setGeneric("setRegParam", function(object, beta) standardGeneric("setRegParam"))
+
+#' @export
+setGeneric("to_sigex", function(object) standardGeneric("to_sigex"))

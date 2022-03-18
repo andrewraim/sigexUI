@@ -50,3 +50,29 @@ setMethod("asSigexParamVARMA", c(object = "ar"), function(object) {
 	p = object$order
 	SigexParamVARMA(ar = ar_hat, ma = array(0, dim = c(N,N,0)))
 })
+
+
+#' @export
+setMethod("to_sigex",
+	c(object = "SigexParamVARMA"),
+	function(object) {
+
+		# dimensionallity of sigexParamVARMA object
+		N <- dim(object@ar)[1]
+		p <- dim(object@ar)[3]
+		q <- dim(object@ma)[3]
+
+		# init array of correct dim
+		out <- array(dim = c(N, N, p+q))
+
+		# set index of output array for ar/ma slots
+		idx_ar = seq_len(p)
+		idx_ma = p + seq_len(q)
+
+		# fill output array
+		out[,,idx_ar] <- object@ar
+		out[,,idx_ma] <- object@ma
+
+		return(out)
+	}
+)
