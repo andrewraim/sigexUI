@@ -64,7 +64,7 @@ setClass("SigexParam",
 #' @export
 setClass("SigexParamARMA",
 	contains = "SigexParamTS",
-	slots = c(ar = "numeric", ma = "numeric"),
+	slots = c(ar = "matrix", ma = "matrix"),
 	prototype = list(model_class = "ARMA")
 )
 
