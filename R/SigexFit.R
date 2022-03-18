@@ -6,7 +6,11 @@ SigexFit <- function(model, data, param = NULL){
 	TT <- dim(data)[1]
 
 	# ---- Set Default param setup (if no SigexParam supplied) ----
-	if(SigexParam == NULL){
+	# This step is not needed since if user doesn't specify a param we can
+	#     just directly run the sigex.mlefit and convert to the new S4 param
+	#     setup afterwards.
+
+	if(is.null(SigexParam)){
 
 		# initialize param
 		param <- SigexParam(N)
@@ -15,7 +19,7 @@ SigexFit <- function(model, data, param = NULL){
 		J <- length( model@mdl$type )
 
 		# Add J default components to param
-		gcd_init = GCD(L = diag(N), D_vec = rep(1, N))
+		gcd_init = GCD(L = diag(N), D_vec = rep(0, N))
 		beta_init = rep(0, N)
 		for(j in 1:J){
 			param <- param %>%
@@ -40,6 +44,7 @@ SigexFit <- function(model, data, param = NULL){
 	for(j in 1:J){
 		parOld[[1]][[j]] <- param@gcds[[j]]@L
 		parOld[[2]][[j]] <- param@gcds[[j]]@D_vec
+		parOld[[3]][[j]] <- diag()
 	}
 
 	# ---- Run Tucker mle fitting ----
