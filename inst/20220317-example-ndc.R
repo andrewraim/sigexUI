@@ -42,15 +42,15 @@ psi.init = as.vector(c(covmat.yw[[1]][2, 1], log(covmat.yw[[2]]), var.out, colMe
 mdl = NULL
 mdl = sigex.add(mdl = mdl,
 	vrank = seq(1,N),
-	class = "varma",
-	order = c(2, 0),
+	class = "arma",
+	order = c(2, 3),
 	bounds = NULL,
 	name = "process1",
 	delta = c(1,-1) )
 mdl = sigex.add(mdl = mdl,
 				vrank = seq(1,N),
-				class = "varma",
-				order = c(0, 2),
+				class = "arma",
+				order = c(4, 5),
 				bounds = NULL,
 				name = "process2",
 				delta = c(1,-1) )
@@ -128,6 +128,7 @@ constraint = SigexConstraint(A = diag(3), b = numeric(3))
 gcd = GCD(L = covmat.yw[[1]], D_vec = covmat.yw[[2]])
 beta = colMeans(diff(ts(ndc[2:T,])))
 
+# setup param with VARMA(2, 3), VARMA(4, 5) and VARMA(6, 7)
 param = SigexParam(N) %>%
   addParam(SigexParamVARMA(ar = par.yw[,,1:2], ma = par.yw[,,1:3]), gcd) %>%
   addParam(SigexParamVARMA(ar = par.yw[,,1:4], ma = par.yw[,,1:5]), ar.fit$var.pred) %>%
@@ -135,12 +136,23 @@ param = SigexParam(N) %>%
   setRegParam(beta = beta)
 print(param)
 
+# setup param with empty array for AR and MA components
 param = SigexParam(N) %>%
 	addParam(SigexParamVARMA(ar = par.yw[,,1:2], ma = par.yw[,,numeric(0)]), gcd) %>%
 	addParam(SigexParamVARMA(ar = par.yw[,,numeric(0)], ma = par.yw[,,1:5]), ar.fit$var.pred) %>%
 	addParam(SigexParamVARMA(ar = par.yw[,,1:6], ma = par.yw[,,1:7]), ar.fit$var.pred, rank = 2) %>%
 	setRegParam(beta = beta)
 print(param)
+
+# Setup param with two ARMA components and a VARMA
+param = SigexParam(N) %>%
+	addParam(SigexParamARMA(ar = matrix(0, N, 2), ma = matrix(0, N, 3)), gcd) %>%
+	addParam(SigexParamARMA(ar = matrix(0, N, 4), ma = matrix(0, N, 5)), ar.fit$var.pred) %>%
+	addParam(SigexParamVARMA(ar = par.yw[,,1:6], ma = par.yw[,,1:7]), ar.fit$var.pred, rank = 2) %>%
+	setRegParam(beta = beta)
+print(param)
+
+
 
 # SigexModelComponent is like an abstract class though. Really there are ARMA
 # components, VARMA components, etc
