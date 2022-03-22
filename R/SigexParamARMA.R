@@ -34,3 +34,32 @@ setMethod("asSigexParamARMA", c(object = "ar"), function(object) {
 	p = object$order
 	SigexParamARMA(ar = ar_hat, ma = numeric(0))
 })
+
+
+#' @export
+setMethod("to_sigex",
+		  c(object = "SigexParamARMA"),
+		  function(object) {
+
+		  	# dimensionallity of sigexParamARMA object
+		  	#  object@ar matrix of dim (N x p)
+		  	#  object@ma matrix of dim (N x q)
+		  	N <- dim(object@ar)[1]
+		  	p <- dim(object@ar)[2]
+		  	q <- dim(object@ma)[2]
+
+		  	# init matrix of correct dim.
+		  	# sigex cbinds coef matricies to dim N x (p+q)
+		  	out <- matrix(nrow = N, ncol = p + q)
+
+		  	# set index of output array for ar/ma slots
+		  	idx_ar = seq_len(p)
+		  	idx_ma = p + seq_len(q)
+
+		  	# fill output array
+		  	out[, idx_ar] <- object@ar
+		  	out[, idx_ma] <- object@ma
+
+		  	return(out)
+		  }
+)
