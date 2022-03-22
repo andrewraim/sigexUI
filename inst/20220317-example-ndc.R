@@ -1,5 +1,5 @@
 library(methods)
-library(sigex)
+# library(sigex)
 library(magrittr)
 
 # ----- Example using existing sigex interface -----
@@ -147,6 +147,14 @@ print(param)
 # Setup param with two ARMA components and a VARMA
 param = SigexParam(N) %>%
 	addParam(SigexParamARMA(ar = matrix(0, N, 2), ma = matrix(0, N, 3)), gcd) %>%
+	addParam(SigexParamARMA(ar = matrix(0, N, 4), ma = matrix(0, N, 5)), ar.fit$var.pred) %>%
+	addParam(SigexParamVARMA(ar = par.yw[,,1:6], ma = par.yw[,,1:7]), ar.fit$var.pred, rank = 2) %>%
+	setRegParam(beta = beta)
+print(param)
+
+# Setup param with two ARMA components (with empty AR and MA parts) and a VARMA
+param = SigexParam(N) %>%
+	addParam(SigexParamARMA(ar = matrix(0, N, 2), ma = matrix(0, N, 1)[numeric(0), numeric(0)]), gcd) %>%
 	addParam(SigexParamARMA(ar = matrix(0, N, 4), ma = matrix(0, N, 5)), ar.fit$var.pred) %>%
 	addParam(SigexParamVARMA(ar = par.yw[,,1:6], ma = par.yw[,,1:7]), ar.fit$var.pred, rank = 2) %>%
 	setRegParam(beta = beta)
