@@ -31,3 +31,6 @@ setGeneric("setRegParam", function(object, beta) standardGeneric("setRegParam"))
 
 #' @export
 setGeneric("to_sigex", function(object) standardGeneric("to_sigex"))
+
+#' @export
+setGeneric("asSigexFit", function(object) standardGeneric("asSigexFit"))
