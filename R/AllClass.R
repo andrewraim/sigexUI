@@ -30,6 +30,21 @@ setClass("SigexModelComponentVARMA",
 	)
 )
 
+
+# This class inherits from SigexModelComponent
+#' @export
+setClass("SigexModelComponentARMA",
+		 contains = "SigexModelComponent",
+		 slots = c(
+		 	p = "numeric",
+		 	q = "numeric"
+		 ),
+		 prototype = list(
+		 	model_class = "varma"
+		 )
+)
+
+
 #' A base class for SigexParamTS types
 #' @export
 setClass("SigexParamTS",
@@ -87,5 +102,16 @@ setClass("SigexModel",
 		mdl = NULL,
 		components = list()
 	)
+)
+
+#' @export
+setClass("SigexFit",
+		 contains = "SigexParam",
+		 slots = c(
+		 	optim_output = "list"
+		 ),
+		 prototype = list(
+		 	optim_output = NULL
+		 )
 )
 
