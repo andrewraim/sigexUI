@@ -106,12 +106,14 @@ setClass("SigexModel",
 
 #' @export
 setClass("SigexFit",
-		 contains = "SigexParam",
+		 # contains = "SigexParam",
 		 slots = c(
-		 	optim_output = "list"
+		 	optim_output = "list",
+		 	param = "SigexParam"
 		 ),
 		 prototype = list(
-		 	optim_output = NULL
+		 	optim_output = NULL,
+		 	param = NULL
 		 )
 )
 
