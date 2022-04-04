@@ -63,7 +63,7 @@ setClass("SigexParamTS",
 #' @export
 setClass("SigexParam",
 	slots = c(
-		N = "integer",
+		N = "numeric", # Used to be integer but floating pt arithmetic issues
 		gcds = "list",
 		ts_params = "list",
 		reg_param = "numeric"
