@@ -52,7 +52,7 @@ setMethod("addComponent",
 
 		# Set a default value for bounds if missing
 		if (missing(bounds)) {
-			bounds = c(-Inf, Inf, -Inf, Inf)
+			bounds = NULL
 		}
 
 		stopifnot(is.numeric(bounds))
@@ -91,4 +91,8 @@ setMethod("setRegComponent",
 		invisible(object)
 	}
 )
+
+
+
+
 
