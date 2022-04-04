@@ -52,7 +52,7 @@ setMethod("addComponent",
 
 		# Set a default value for bounds if missing
 		if (missing(bounds)) {
-			bounds = NULL
+			bounds = c(-Inf, Inf, -Inf, Inf)
 		}
 
 		stopifnot(is.numeric(bounds))
@@ -94,5 +94,26 @@ setMethod("setRegComponent",
 
 
 
+#' @export
+setMethod("to_sigex",
+		  c(object = "SigexModel"),
+		  function(object) {
+		  	out <- vector(mode = 'list', length = 4)
+
+		  	# ranks comp of mdl
+		  	out[[1]] <- object@mdl$ranks
+
+		  	# type comp of mdl
+		  	out[[2]] <- object@mdl$type
+
+		  	# delta comp of mdl
+		  	out[[3]] <- object@mdl$diffop
+
+		  	# regressor comp of  mdl
+		  	out[[4]] <- object@mdl$regress
+
+		  	return(out)
+		  }
+)
 
 
