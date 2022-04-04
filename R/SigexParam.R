@@ -102,3 +102,30 @@ setMethod("to_sigex",
 	}
 )
 
+
+# convert to SigexParam from sigex mdl
+# NOT FINISHED - still need to piece together output of class SigexParam
+#' @export
+setMethod("asSigexParam",
+		  c(paramObject = "list", mdlObject = "list"),
+		  function(object) {
+
+		  	# Ex input: asSigexParam(fit.mle[[2]], mdl)
+
+		  	N <- dim(paramObject[[1]][[1]])[1]
+		  	K <- length(mdlObject[[1]])
+
+		  	outSigexParam <- SigexParam(N)
+
+		  	for(k in K){
+		  		compTyp <- mdlObject[[2]][[k]][[1]]
+		  		compPar <- mdlObject[[2]][[k]][[2]]
+		  	    compEpi <- mdlObject[[2]][[k]][[4]]
+		  	}
+
+})
+
+
+
+
+
