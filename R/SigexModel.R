@@ -117,3 +117,49 @@ setMethod("to_sigex",
 )
 
 
+# convert to SigexModel from sigex mdl
+#' @export
+setMethod("asSigexModel",
+		  c(mdlObject = "list"),
+		  function(mdlObject) {
+
+		  	N <- length(mdlObject$ranks[[1]])
+		  	K <- length(mdlObject[[1]]) # number of model components
+
+		  	outSigexModel <- SigexModel(N)
+
+		  	for(k in K){
+		  		compTyp <- mdlObject$type[[k]][[1]]
+		  		compPar <- mdlObject$type[[k]][[2]]
+		  		compEpi <- mdlObject$type[[k]][[4]]
+		  		diffOp  <- mdl$diffop[[k]]
+		  		# switch to create output of the correct class
+		  		# Right now only support: "arma" and "varma"
+		  		if(compTyp == "arma"){
+
+		  			outSigexModel <- outSigexModel %>%
+		  				addComponent(SigexModelComponentARMA(
+		  							  	p = compPar[1],
+		  							  	q = compPar[1],
+		  							  	epithet = compEpi,
+		  							  	delta = diffOp     ))
+
+		  		}else if(compTyp == "varma"){
+
+		  			outSigexModel <- outSigexModel %>%
+		  				addComponent(SigexModelComponentVARMA(
+		  					p = compPar[1],
+		  					q = compPar[1],
+		  					epithet = compEpi,
+		  					delta = diffOp     ))
+
+		  		}else{
+		  			msg <- paste("components of type", compType, "not yet supports")
+		  			stop(msg)
+		  		}
+		  	}
+
+		  	return(outSigexModel)
+
+		  }
+)

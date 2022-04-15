@@ -34,3 +34,9 @@ setGeneric("to_sigex", function(object) standardGeneric("to_sigex"))
 
 #' @export
 setGeneric("asSigexFit", function(object) standardGeneric("asSigexFit"))
+
+#' @export
+setGeneric("asSigexParam", function(paramObject, mdlObject) standardGeneric("asSigexParam"))
+
+#' @export
+setGeneric("asSigexModel", function(mdlObject) standardGeneric("asSigexModel"))
