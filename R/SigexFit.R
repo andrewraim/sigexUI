@@ -10,15 +10,14 @@ SigexFit = function(optimOut, paramEst) {
 
 SigexMLE <- function(SigexModel, data, SigexParam = NULL){
 
+	mdl <- to_sigex(SigexModel)
 
 	if(!is.null(SigexParam)) {
 		param <- to_sigex(SigexParm)
 	} else {
-		param <- sigex.default()
+		param <- sigex.default(mdl = mdl, data.ts = data.ts, constraint = NULL)
 	}
 
-
-	mdl <- to_sigex(SigexModel) # Needs to be written
 
 
 	st = Sys.time()
