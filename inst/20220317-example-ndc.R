@@ -166,11 +166,26 @@ print(param)
 # components, VARMA components, etc
 
 model = SigexModel(N) %>%
-	addComponent(SigexModelComponentVARMA(p = 2, q = 2, epithet = "process", delta = c(1,-1))) %>%
+	addComponent(SigexModelComponentVARMA(p = 1, q = 0, epithet = "process", delta = c(1,-1))) %>%
 	addComponent(SigexModelComponentVARMA(p = 0, q = 0, epithet = "irregular", delta = c(1))) %>%
     setRegComponent(data.ts, d = 0)
 model
 model@mdl
+
+
+model <- SigexModel(N) %>%
+	addComponent(SigexModelComponentARMA(p = 2,
+										 q = 3,
+										 epithet = "comp1",
+										 delta = c(1, -1))) %>%
+	addComponent(SigexModelComponentARMA(p = 4,
+										 q = 5,
+										 epithet = "comp2",
+										 delta = c(1, -1))) %>%
+	addComponent(SigexModelComponentVARMA(p = 6,
+										 q = 7,
+										 epithet = "comp3",
+										 delta = c(1, -1)))
 
 epithet(model@components[[1]])
 delta(model@components[[1]])
