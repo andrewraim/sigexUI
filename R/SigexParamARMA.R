@@ -10,15 +10,15 @@ SigexParamARMA = function(ar, ma) {
 
 #' @export
 setMethod("modelClass", "SigexParamARMA", function(object) {
-	p = length(object@ar)
-	q = length(object@ma)
+	p = ncol(object@ar)
+	q = ncol(object@ma)
 	sprintf("ARMA(%d,%d)", p, q)
 })
 
 #' @export
 setMethod("show", "SigexParamARMA", function(object) {
-	p = length(object@ar)
-	q = length(object@ma)
+	p = dim(object@ar)[2]
+	q = dim(object@ma)[2]
 	printf("--- Param for ARMA(%d,%d) ---\n", p, q)
 	printf("ar:\n")
 	print(object@ar)
@@ -38,28 +38,28 @@ setMethod("asSigexParamARMA", c(object = "ar"), function(object) {
 
 #' @export
 setMethod("to_sigex",
-		  c(object = "SigexParamARMA"),
-		  function(object) {
+	c(object = "SigexParamARMA"),
+	function(object) {
 
-		  	# dimensionallity of sigexParamARMA object
-		  	#  object@ar matrix of dim (N x p)
-		  	#  object@ma matrix of dim (N x q)
-		  	N <- dim(object@ar)[1]
-		  	p <- dim(object@ar)[2]
-		  	q <- dim(object@ma)[2]
+		# dimensionallity of sigexParamARMA object
+		#  object@ar matrix of dim (N x p)
+		#  object@ma matrix of dim (N x q)
+		N <- dim(object@ar)[1]
+		p <- dim(object@ar)[2]
+		q <- dim(object@ma)[2]
 
-		  	# init matrix of correct dim.
-		  	# sigex cbinds coef matricies to dim N x (p+q)
-		  	out <- matrix(nrow = N, ncol = p + q)
+		# init matrix of correct dim.
+		# sigex cbinds coef matricies to dim N x (p+q)
+		out <- matrix(nrow = N, ncol = p + q)
 
-		  	# set index of output array for ar/ma slots
-		  	idx_ar = seq_len(p)
-		  	idx_ma = p + seq_len(q)
+		# set index of output array for ar/ma slots
+		idx_ar = seq_len(p)
+		idx_ma = p + seq_len(q)
 
-		  	# fill output array
-		  	out[, idx_ar] <- object@ar
-		  	out[, idx_ma] <- object@ma
+		# fill output array
+		out[, idx_ar] <- object@ar
+		out[, idx_ma] <- object@ma
 
-		  	return(out)
-		  }
+		return(out)
+	}
 )
