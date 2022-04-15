@@ -103,27 +103,42 @@ setMethod("to_sigex",
 )
 
 
-# convert to SigexParam from sigex mdl
-# NOT FINISHED - still need to piece together output of class SigexParam
 #' @export
 setMethod("asSigexParam",
-		  c(paramObject = "list", mdlObject = "list"),
-		  function(object) {
+    c(paramObject = "list", mdlObject = "list"),
+	function(paramObject, mdlObject){
 
-		  	# Ex input: asSigexParam(fit.mle[[2]], mdl)
+		N <- dim(paramObject[[1]][[1]])[1]
+		K <- length(mdlObject[[1]]) # number of model components
 
-		  	N <- dim(paramObject[[1]][[1]])[1]
-		  	K <- length(mdlObject[[1]])
+		outSigexParam <- SigexParam(N)
 
-		  	outSigexParam <- SigexParam(N)
+		for(k in 1:K){
+			compTyp <- mdlObject$type[[k]][[1]]
+			compPar <- mdlObject$type[[k]][[2]]
+			compGCD = GCD(L = paramObject[[1]][[k]],
+						  D_vec = paramObject[[2]][[k]])
+			# Switch to decide on type
+			if(compTyp == 'arma'){
+				outSigexParam <- outSigexParam %>%
+					addParam(SigexParamARMA(ar = paramObject[[3]][[k]][, 1:compPar[1]],
+											ma = paramObject[[3]][[k]][, (compPar[1] + 1):(compPar[1] + compPar[2])] ),
+							 compGCD)
+			}else if (compTyp == "varma"){
+				outSigexParam <- outSigexParam %>%
+					addParam(SigexParamVARMA(ar = paramObject[[3]][[k]][, ,1:compPar[1]],
+											 ma = paramObject[[3]][[k]][, ,(compPar[1] + 1):(compPar[1] + compPar[2])] ),
+							 compGCD)
+			}else{
+				msg <- paste("components of type", compTyp,
+								  "not yet supported in asSigexParam")
+				stop(msg)
+			}
+		}
 
-		  	for(k in K){
-		  		compTyp <- mdlObject[[2]][[k]][[1]]
-		  		compPar <- mdlObject[[2]][[k]][[2]]
-		  	    compEpi <- mdlObject[[2]][[k]][[4]]
-		  	}
-
-})
+		return(outSigexParam)
+	}
+)
 
 
 
