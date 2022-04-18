@@ -103,6 +103,8 @@ setMethod("to_sigex",
 )
 
 
+# We need to mdl as an input here to know the type of each component
+#    eg) arma, varma, etc
 #' @export
 setMethod("asSigexParam",
     c(paramObject = "list", mdlObject = "list"),
@@ -118,11 +120,14 @@ setMethod("asSigexParam",
 			compPar <- mdlObject$type[[k]][[2]]
 			compGCD = GCD(L = paramObject[[1]][[k]],
 						  D_vec = paramObject[[2]][[k]])
+
 			# Switch to decide on type
 			if(compTyp == 'arma'){
+				p <- compPar[1]
+				q <- compPar[2]
 				outSigexParam <- outSigexParam %>%
-					addParam(SigexParamARMA(ar = paramObject[[3]][[k]][, 1:compPar[1]],
-											ma = paramObject[[3]][[k]][, (compPar[1] + 1):(compPar[1] + compPar[2])] ),
+					addParam(SigexParamARMA(ar = paramObject[[3]][[k]][, 1:p],
+											ma = paramObject[[3]][[k]][, (p + 1):(p + q)] ),
 							 compGCD)
 			}else if (compTyp == "varma"){
 				outSigexParam <- outSigexParam %>%
@@ -139,6 +144,31 @@ setMethod("asSigexParam",
 		return(outSigexParam)
 	}
 )
+
+
+#' @export
+setMethod("coef",
+	c(object = "SigexParam"),
+	function(object){
+		print(object)
+	}
+)
+
+#' @export
+setMethod("component",
+		  c(object = "SigexParam", index = "numeric"),
+		  function(object, index){
+			  new("SigexParam",
+			      N = object@N,
+			  	  gcds = object@gcds[index],
+			  	  ts_params = object@ts_params[index],
+			  	  reg_param = object@reg_param[index]
+			  )
+		  }
+)
+
+
+
 
 
 
