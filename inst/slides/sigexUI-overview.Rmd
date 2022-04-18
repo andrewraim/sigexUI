@@ -91,7 +91,7 @@ Let's look at the source code for *arima*
 
 <https://github.com/SurajGupta/r-source/blob/master/src/library/stats/R/arima.R>
 
-
+method dispatch for class *Arima* starts at line 373.
 
 ################################################################################
 ## Some Definitions
@@ -101,6 +101,12 @@ Let's look at the source code for *arima*
 - **Methods**
 - **Generic Function**
 - **Method Dispatch**
+
+
+################################################################################
+## Structure of sigexUI: Classes
+
+
 
 
 
