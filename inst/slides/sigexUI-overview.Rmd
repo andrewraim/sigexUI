@@ -5,11 +5,35 @@ date: "4/19/2022"
 output: 
   ioslides_presentation:
     smaller: true
-    hitheme: github
+    hightlight: pygments
+    # hitheme: github
+editor_options: 
+  chunk_output_type: console
 ---
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r libs, echo=FALSE}
+devtools::load_all("~/Github/SigexUI")
+devtools::load_all("~/Github/sigex")
+library(magrittr)
+```
+```{r data, echo=FALSE}
+# Make a ts object with the built-in ts function
+dataALL.ts = ts(data = ndc,
+	start = c(1992, 1),
+	frequency = 12,
+	names = c("Shipments", "NewOrders"))
+data.ts = sigex.prep(data.ts = dataALL.ts,
+	transform = "none",
+	aggregate = FALSE,
+	subseries = 1:2,
+	range = NULL,
+	plot = FALSE)
+N <- ncol(data.ts)
+T <- nrow(data.ts)
 ```
 
 ################################################################################
@@ -42,6 +66,25 @@ Want to "future proof" development of future add-ons.
 
 ################################################################################
 ## Class system in R
+
+R has a three-class system
+
+- S3
+- S4
+- Reference Class
+
+S3 Class
+
+- S3 is the simplest yet the most popular
+- lacks formal definition and structure
+- An object of this type can be created by just adding an attribute to it
+	* we will see this on the next slide with Arima class
+	
+S4 Class
+
+- objects have a proper definition 
+- gives proper structure to its objects
+- **We will be implimenting S4 classes in SigexUI**
 
 
 ################################################################################
@@ -77,7 +120,18 @@ predict(fit, n.ahead = 2)
 ################################################################################
 ## Example: fitting ARIMA model
 
-How does this happen?
+How does this happen? 
+
+First look at what is returned by the `arima()` function
+
+```{r, eval=FALSE}
+    structure(list(coef = coef, sigma2 = sigma2, var.coef = var, mask = mask,
+		   loglik = -0.5 * value, aic = aic, arma = arma,
+		   residuals = resid, call = match.call(), series = series,
+		   code = res$convergence, n.cond = ncond, nobs = n.used,
+		   model = mod),
+	      class = "Arima")
+```
 
 ```{r}
 str(fit)
@@ -97,14 +151,223 @@ method dispatch for class *Arima* starts at line 373.
 ## Some Definitions
 
 - **Classes** user-defined data types, blueprint for individual objects, attributes and methods.
+	* Arima
 - **Object** instances of a class created with specifically defined data. Objects can correspond to real-world objects or an abstract entity.
+	* `fit`
 - **Methods**
+
 - **Generic Function**
+	*
 - **Method Dispatch**
 
 
 ################################################################################
 ## Structure of sigexUI: Classes
+
+- Seperate params and models
+
+A SigexParam has three things:
+
+1. A list of K GCDs
+2. The time series parameters whose exact form depends on the class of this latent process
+3. Regression parameters
+
+```{r, eval=FALSE}
+#' @export
+setClass("SigexParam",
+	slots = c(
+		N = "numeric", # Used to be integer but floating pt arithmetic issues
+		gcds = "list",
+		ts_params = "list",
+		reg_param = "numeric"
+	),#
+	prototype = list(
+		N = NA_integer_,
+	#	gcd_list = list(),
+	#	ts_param_list = NA_real_,
+		reg_param = NA_real_
+	)
+)
+```
+
+
+## Additional param sub-classes
+
+```{r, eval=FALSE}
+#' @export
+setClass("SigexParamARMA",
+	contains = "SigexParamTS",
+	slots = c(ar = "matrix", ma = "matrix"),
+	prototype = list(model_class = "ARMA")
+)
+
+#' @export
+setClass("SigexParamVARMA",
+	contains = "SigexParamTS",
+	slots = c(ar = "array", ma = "array"),
+	prototype = list(model_class = "VARMA")
+)
+```
+
+
+## Model class
+
+The components slot is a list of time series components which themselves are a class.
+This allows flexibility when printing, error checking, etc each individial component.
+
+```{r, eval=FALSE}
+#' @export
+setClass("SigexModel",
+	slots = c(
+		N = "integer",
+		mdl = "list",
+		components = "list"
+	),
+	prototype = list(
+		N = NA_integer_,
+		mdl = NULL,
+		components = list()
+	)
+)
+```
+
+## Model component abstract base class
+
+```{r, eval=FALSE}
+# This is an abstract base class
+#' @export
+setClass("SigexModelComponent",
+	slots = c(
+		model_class = "character",
+		delta = "numeric",
+		epithet = "character"
+	),
+	prototype = list(
+		model_class = "NULL",
+		delta = NULL,
+		epithet = "NULL"
+	)
+)
+```
+
+## Model component classes 
+
+```{r, eval=FALSE}
+# This class inherits from SigexModelComponent
+#' @export
+setClass("SigexModelComponentVARMA",
+	contains = "SigexModelComponent",
+	slots = c(
+		p = "numeric",
+		q = "numeric"
+	),
+	prototype = list(
+		model_class = "varma"
+	)
+)
+
+
+# This class inherits from SigexModelComponent
+#' @export
+setClass("SigexModelComponentARMA",
+		 contains = "SigexModelComponent",
+		 slots = c(
+		 	p = "numeric",
+		 	q = "numeric"
+		 ),
+		 prototype = list(
+		 	model_class = "varma"
+		 )
+)
+```
+
+## Old way of setting up model
+
+```{r}
+# Set up a model
+mdl = NULL
+mdl = sigex.add(mdl = mdl,
+	vrank = seq(1,N),
+	class = "arma",
+	order = c(2, 3),
+	bounds = NULL,
+	name = "process1",
+	delta = c(1,-1) )
+mdl = sigex.add(mdl = mdl,
+				vrank = seq(1,N),
+				class = "arma",
+				order = c(4, 5),
+				bounds = NULL,
+				name = "process2",
+				delta = c(1,-1) )
+mdl = sigex.add(mdl = mdl,
+				vrank = seq(1,N),
+				class = "varma",
+				order = c(6, 7),
+				bounds = NULL,
+				name = "process3",
+				delta = c(1,-1) )
+mdl = sigex.meaninit(mdl = mdl, data.ts = data.ts, d = 0)
+```
+
+
+## SigexUI way of setting up model 
+
+```{r}
+model <- SigexModel(N) %>%
+	addComponent(SigexModelComponentARMA(p = 2,
+										 q = 3,
+										 epithet = "comp1",
+										 delta = c(1, -1))) %>%
+	addComponent(SigexModelComponentARMA(p = 4,
+										 q = 5,
+										 epithet = "comp2",
+										 delta = c(1, -1))) %>%
+	addComponent(SigexModelComponentVARMA(p = 6,
+										 q = 7,
+										 epithet = "comp3",
+										 delta = c(1, -1))) %>%
+	setRegComponent(data.ts, d = 0)
+```
+
+## Compare print 
+
+```{r}
+model
+mdl
+```
+
+	
+## Old way of setting up parameters
+
+```{r}
+par = sigex.default(mdl = mdl, data.ts = data.ts, constraint = NULL)
+print(par)
+```
+
+## SigexUI way of setting up parameters
+
+```{r}
+# Setup param with two ARMA components (with empty AR and MA parts) and a VARMA
+param = SigexParam(N) %>%
+	addParam(SigexParamARMA(ar = matrix(0, N, 2), ma = matrix(0, N, 3)), diag(N)) %>%
+	addParam(SigexParamARMA(ar = matrix(0, N, 4), ma = matrix(0, N, 5)), diag(N)) %>%
+	addParam(SigexParamVARMA(ar = array(0, c(N, N, 6)), ma = array(0, c(N, N, 7))), diag(N)) %>%
+	setRegParam(beta = rep(0, N))
+print(param)
+```
+
+
+## Some helper functions 
+
+```{r}
+epithet(model@components[[1]])
+delta(model@components[[1]])
+modelClass(model@components[[1]])
+```
+
+
+## SigexFit 
 
 
 
