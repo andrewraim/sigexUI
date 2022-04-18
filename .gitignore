@@ -37,3 +37,5 @@ vignettes/*.pdf
 
 # R Environment Variables
 .Renviron
+inst/slides/fit.RData
+inst/slides/fitmle.RData
