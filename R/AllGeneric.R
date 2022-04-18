@@ -40,3 +40,10 @@ setGeneric("asSigexParam", function(paramObject, mdlObject) standardGeneric("asS
 
 #' @export
 setGeneric("asSigexModel", function(mdlObject) standardGeneric("asSigexModel"))
+
+
+#' @export
+setGeneric("coef", function(object) standardGeneric("coef"))
+
+#' @export
+setGeneric("component", function(object, index) standardGeneric("component"))
