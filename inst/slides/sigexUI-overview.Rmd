@@ -1,0 +1,106 @@
+---
+title: "sigexUI-overview"
+author: "AR & JL"
+date: "4/19/2022"
+output: 
+  ioslides_presentation:
+    smaller: true
+    hitheme: github
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+################################################################################
+## Disclaimer
+
+This article is released to inform interested parties of ongoing research and to
+encourage discussion of work in progress.
+Any views expressed are those of the authors and not
+those of the U.S. Census Bureau.
+
+
+################################################################################
+## Why?
+
+Following feedback from JSS and other users we aim to make `sigex` fit more
+seamlessly into the R ecosystem.
+
+- User friendly defaults
+- Error/wanrining checks
+- Esstablished R function support
+	* `residuals()`
+	* `summary()`
+	* `print()`
+
+Want to "future proof" development of future add-ons.
+
+- Don't make classes or helper functions too rigid
+- Think about the high level structures of multivariate unobserved component models
+
+
+################################################################################
+## Class system in R
+
+
+################################################################################
+## Example: fitting ARIMA model
+
+We have all fit an ARIMA model to the AirPassengers Series. 
+
+```{r, echo = TRUE}
+fit <- arima(AirPassengers, order = c(1, 0, 0))
+class(fit)
+```
+
+################################################################################
+## Example: fitting ARIMA model
+
+The R ecosystem and its users is now familiar with the concepts of `fit` being
+the output of a model and with that comes ceritain expectations about how it should 
+behave. For example,
+
+```{r, collapse=TRUE}
+coef(fit)
+```
+```{r, collapse=TRUE}
+AIC(fit)
+```
+```{r, collapse=TRUE}
+logLik(fit)
+```
+```{r, collapse=TRUE}
+predict(fit, n.ahead = 2)
+```
+
+################################################################################
+## Example: fitting ARIMA model
+
+How does this happen?
+
+```{r}
+str(fit)
+```
+
+
+################################################################################
+## Example: fitting ARIMA model
+
+Let's look at the source code for *arima*
+
+<https://github.com/SurajGupta/r-source/blob/master/src/library/stats/R/arima.R>
+
+
+
+################################################################################
+## Some Definitions
+
+- **Classes** user-defined data types, blueprint for individual objects, attributes and methods.
+- **Object** instances of a class created with specifically defined data. Objects can correspond to real-world objects or an abstract entity.
+- **Methods**
+- **Generic Function**
+- **Method Dispatch**
+
+
+
