@@ -125,10 +125,26 @@ setMethod("asSigexParam",
 			if(compTyp == 'arma'){
 				p <- compPar[1]
 				q <- compPar[2]
-				outSigexParam <- outSigexParam %>%
-					addParam(SigexParamARMA(ar = paramObject[[3]][[k]][, 1:p],
-											ma = paramObject[[3]][[k]][, (p + 1):(p + q)] ),
-							 compGCD)
+				if(p == 0 & q == 0){
+					next
+				}else if (p == 0 & q > 0){
+					maMat <- as.matrix(paramObject[[3]][[k]])
+					outSigexParam <- outSigexParam %>%
+						addParam(new("SigexParamARMA", ma = maMat),
+								 compGCD)
+				}else if (p > 0 & q == 0){
+					arMat <- as.matrix(paramObject[[3]][[k]])
+					outSigexParam <- outSigexParam %>%
+						addParam(new("SigexParamARMA", ar = arMat),
+								 compGCD)
+				}else{
+					arMat <- as.matrix(paramObject[[3]][[k]][, 1:p])
+					maMat <- as.matrix(paramObject[[3]][[k]][, (p+1):(p+q)])
+					outSigexParam <- outSigexParam %>%
+						addParam(new("SigexParamARMA", ar = arMat,
+									                   ma = maMat),
+								 compGCD)
+				}
 			}else if (compTyp == "varma"){
 				outSigexParam <- outSigexParam %>%
 					addParam(SigexParamVARMA(ar = paramObject[[3]][[k]][, ,1:compPar[1]],
