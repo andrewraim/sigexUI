@@ -54,9 +54,8 @@ setMethod("show",
 		printf("optim_convergence_code = %d, lik = %f\n",
 			   optimOut$convergence, optimOut$value)
 		print("Parameter Estimates:")
-		print(paramEst@ts_params)
+		print(object@param@ts_params)
 })
-
 
 
 # ' @export
