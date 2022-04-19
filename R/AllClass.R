@@ -40,7 +40,7 @@ setClass("SigexModelComponentARMA",
 		 	q = "numeric"
 		 ),
 		 prototype = list(
-		 	model_class = "varma"
+		 	model_class = "arma"
 		 )
 )
 
@@ -108,12 +108,16 @@ setClass("SigexModel",
 setClass("SigexFit",
 		 # contains = "SigexParam",
 		 slots = c(
-		 	optim_output = "list",
-		 	param = "SigexParam"
+		 	optimOut = "list",
+		 	param    = "SigexParam",
+		 	data     = "matrix",
+		 	model    = "SigexModel"
 		 ),
 		 prototype = list(
-		 	optim_output = NULL,
-		 	param = NULL
+		 	optimOut = NULL,
+		 	param    = NULL,
+		 	data     = NULL,
+		 	model    = NULL
 		 )
 )
 
