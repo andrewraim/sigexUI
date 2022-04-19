@@ -47,3 +47,6 @@ setGeneric("coef", function(object) standardGeneric("coef"))
 
 #' @export
 setGeneric("component", function(object, index) standardGeneric("component"))
+
+#' @export
+setGeneric("lik", function(object) standardGeneric("lik"))
