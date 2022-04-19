@@ -9,17 +9,15 @@ SigexFit = function(optimOut, paramEst) {
 
 # Wrapper function that takes (model, data), converts to sigex conventions
 #     runs sigex.mlefit and then converts to sigexUI conventions.
-SigexMLE <- function(SigexModel, data.ts, SigexParam = NULL){
+SigexMLE <- function(model, data.ts, SigexParam = NULL){
 
-	mdl <- to_sigex(SigexModel)
+	mdl <- to_sigex(model)
 
 	if(!is.null(SigexParam)) {
 		param <- to_sigex(SigexParm)
 	} else {
 		param <- sigex.default(mdl = mdl, data.ts = data.ts, constraint = NULL)
 	}
-
-
 
 	st = Sys.time()
 	fit.mle = sigex.mlefit(data.ts = data.ts,
@@ -31,11 +29,13 @@ SigexMLE <- function(SigexModel, data.ts, SigexParam = NULL){
 	et = Sys.time()
 	run_time <- as.numeric(et - st, units = "secs")
 
-	optimOut <- fit.mle[[1]]
-
 	paramEst <- asSigexParam(fit.mle[[2]], mdl)
 
-	out <- SigexFit(optimOut, paramEst)
+	out <- new("SigexFit",
+			   optimOut = fit.mle[[1]],
+			   param = paramEst,
+			   data = data.ts,
+			   model = model)
 
 	return(out)
 
@@ -48,26 +48,45 @@ SigexMLE <- function(SigexModel, data.ts, SigexParam = NULL){
 setMethod("show",
 	"SigexFit",
 	function(object) {
-		optimOut <- object@optim_output
+		optimOut <- object@optimOut
 		parFit   <- object@param
-		print("SigexFit: \n")
+		print("SigexFit:" )
 		printf("optim_convergence_code = %d, lik = %f\n",
 			   optimOut$convergence, optimOut$value)
+		print("Parameter Estimates:")
+		print(paramEst@ts_params)
 })
 
 
-# We need more objects to be part of SigexFit to get residuals
-#    probably need: mdl, and data...
 
-# # ' @export
-# setMethod("resid",
-# 	"SigexFit",
-# 	function(object) {
-#
-# 		par <- to_sigex(object@param)
-#
-# 		resid.mle <- sigex.resid(psi.mle, mdl, data.ts)[[1]]
-# 		resid.mle <- sigex.load(t(resid.mle), start(data.ts), frequency(data.ts), colnames(data.ts), FALSE)
-#
-# })
+# ' @export
+setMethod("resid",
+	"SigexFit",
+	function(object) {
 
+		optimOut <- object@optimOut
+		data.ts <- object@data
+		mdl <- to_sigex(object@model)
+		par <- to_sigex(object@param)
+		psi <- sigex.eta2psi(eta = optimOut$par, constraint = NULL)
+
+		resid.mle <- sigex.resid(psi, mdl, data.ts)[[1]]
+		resid.mle <- sigex.load(t(resid.mle), start(data.ts), frequency(data.ts), colnames(data.ts), FALSE)
+
+		return(resid.mle)
+})
+
+
+setMethod("lik",
+	"SigexFit",
+	function(object){
+
+		optimOut <- object@optimOut
+		data.ts <- object@data
+		mdl <- to_sigex(object@model)
+		psi <- sigex.eta2psi(eta = optimOut$par, constraint = NULL)
+
+		likOut <- sigex.lik(psi = psi, mdl = mdl, data.ts = data.ts, debug = FALSE)
+
+		return(likOut)
+})
