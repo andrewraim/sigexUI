@@ -40,7 +40,9 @@ setClass("SigexModelComponentARMA",
 		 	q = "numeric"
 		 ),
 		 prototype = list(
-		 	model_class = "arma"
+		 	model_class = "arma",
+		 	p = NULL,
+		 	q = NULL
 		 )
 )
 
@@ -80,7 +82,7 @@ setClass("SigexParam",
 setClass("SigexParamARMA",
 	contains = "SigexParamTS",
 	slots = c(ar = "matrix", ma = "matrix"),
-	prototype = list(model_class = "ARMA")
+	prototype = list(model_class = "ARMA", ar = NULL, ma = NULL)
 )
 
 #' @export
