@@ -3,7 +3,16 @@
 \docType{class}
 \name{SigexParamTS-class}
 \alias{SigexParamTS-class}
-\title{A base class for SigexParamTS types}
+\title{SigexParamTS}
 \description{
-A base class for SigexParamTS types
+An abstract base class for parameters which are specific to time series.
+For example, this includes AR and MA coefficients in an ARMA process, but not
+the covariance matrix.
 }
+\section{Slots}{
+
+\describe{
+\item{\code{model_class}}{A string that uniquely describes the class of time series
+parameters represented by a subclass of this class.}
+}}
+

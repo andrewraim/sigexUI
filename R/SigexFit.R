@@ -14,7 +14,7 @@ SigexMLE <- function(model, data.ts, SigexParam = NULL){
 	mdl <- to_sigex(model)
 
 	if(!is.null(SigexParam)) {
-		param <- to_sigex(SigexParm)
+		param <- to_sigex(SigexParam)
 	} else {
 		param <- sigex.default(mdl = mdl, data.ts = data.ts, constraint = NULL)
 	}

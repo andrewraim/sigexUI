@@ -22,7 +22,7 @@ setMethod("show", "SigexModel", function(object) {
 		printf("%d) ", k)
 		show(object@components[[k]])
 	}
-	if (!is.null(model@mdl$regress)) {
+	if (!is.null(object@mdl$regress)) {
 		printf("Regression model is set\n")
 	}
 	return(invisible(NULL))
@@ -132,29 +132,29 @@ setMethod("asSigexModel",
 		  		compTyp <- mdlObject$type[[k]][[1]]
 		  		compPar <- mdlObject$type[[k]][[2]]
 		  		compEpi <- mdlObject$type[[k]][[4]]
-		  		diffOp  <- mdl$diffop[[k]]
+		  		diffOp  <- mdlObject$diffop[[k]]
 		  		# switch to create output of the correct class
 		  		# Right now only support: "arma" and "varma"
-		  		if(compTyp == "arma"){
+		  		if (compTyp == "arma"){
 
 		  			outSigexModel <- outSigexModel %>%
 		  				addComponent(SigexModelComponentARMA(
 		  							  	p = compPar[1],
 		  							  	q = compPar[1],
 		  							  	epithet = compEpi,
-		  							  	delta = diffOp     ))
+		  							  	delta = diffOp))
 
-		  		}else if(compTyp == "varma"){
+		  		} else if (compTyp == "varma"){
 
 		  			outSigexModel <- outSigexModel %>%
 		  				addComponent(SigexModelComponentVARMA(
 		  					p = compPar[1],
 		  					q = compPar[1],
 		  					epithet = compEpi,
-		  					delta = diffOp     ))
+		  					delta = diffOp))
 
-		  		}else{
-		  			msg <- paste("components of type", compType, "not yet supports")
+		  		} else {
+		  			msg <- paste("components of type", compTyp, "not yet supports")
 		  			stop(msg)
 		  		}
 		  	}

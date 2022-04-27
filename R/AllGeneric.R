@@ -29,12 +29,35 @@ setGeneric("setRegComponent", function(object, data_ts, d) standardGeneric("setR
 setGeneric("addParam", function(object, ts_param, Sigma, rank) standardGeneric("addParam"))
 setGeneric("setRegParam", function(object, beta) standardGeneric("setRegParam"))
 
+#' to_sigex
+#'
+#' Construct a \code{sigex} data structure from the given argument.
+#'
+#' @slot object Argument to convert.
+#'
+#' @return A \code{sigex} data structure.
+#'
 #' @export
 setGeneric("to_sigex", function(object) standardGeneric("to_sigex"))
 
 #' @export
 setGeneric("asSigexFit", function(object) standardGeneric("asSigexFit"))
 
+#' asSigexParam
+#'
+#' Construct a \code{SigexParam} from a \code{sigex} data structure.
+#'
+#' @slot paramObject A \code{sigex} data structure representing parameters.
+#' @slot mdlObject A \code{sigex} data structure representing a model.
+#'
+#' @return A \code{SigexParam}.
+#'
+#' @details
+#' Note that \code{mdlObject} is needed to interpret the elements of
+#' \code{paramObject}.
+#'
+#' AR asks: does this need to be generic?
+#'
 #' @export
 setGeneric("asSigexParam", function(paramObject, mdlObject) standardGeneric("asSigexParam"))
 

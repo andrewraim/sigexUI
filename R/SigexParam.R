@@ -1,3 +1,21 @@
+#' SigexParam
+#'
+#' Construct a new \code{SigexParam} for an \code{N}-dimensional series, with
+#' no latent components or regression model.
+#'
+#' @slot N A \code{SigexParam} object.
+#'
+#' @export
+SigexParam = function(N) {
+	new("SigexParam", N = N, gcds = list(), ts_params = list(), reg_param = numeric(0))
+}
+
+#' setValidity
+#'
+#' Check validity of a new \code{SigexParam}.
+#'
+#' @slot object A \code{SigexParam} object.
+#'
 #' @export
 setValidity("SigexParam", function(object) {
 	# TBD: More checking?
@@ -7,11 +25,12 @@ setValidity("SigexParam", function(object) {
 	return(TRUE)
 })
 
-#' @export
-SigexParam = function(N) {
-	new("SigexParam", N = N, gcds = list(), ts_params = list(), reg_param = numeric(0))
-}
-
+#' show
+#'
+#' \code{show} method for \code{SigexParam}.
+#'
+#' @slot object A \code{SigexParam} object.
+#'
 #' @export
 setMethod("show", "SigexParam", function(object) {
 	K = length(object@gcds)
@@ -28,6 +47,17 @@ setMethod("show", "SigexParam", function(object) {
 	}
 })
 
+#' addParam
+#'
+#' Add parameters for a latent component to the structure.
+#'
+#' @slot object A \code{SigexParam} object.
+#' @slot ts_param A \code{SigexParamTS} object.
+#' @slot Sigma A \code{GCD} object which represents a \eqn{N \times N}
+#' covariance matrix.
+#'
+#' @return Returns \code{object} invisibly.
+#'
 #' @export
 setMethod("addParam",
 	c(object = "SigexParam", ts_param = "SigexParamTS", Sigma = "GCD"),
@@ -48,6 +78,17 @@ setMethod("addParam",
 	}
 )
 
+#' addParam
+#'
+#' Add parameters for a latent component to the structure.
+#'
+#' @slot object A \code{SigexParam} object.
+#' @slot ts_param A \code{SigexParamTS} object.
+#' @slot Sigma A \eqn{N \times N} covariance matrix.
+#' @slot rank TBD: this is for GCD. Explain this and its default value.
+#'
+#' @return Returns \code{object} invisibly.
+#'
 #' @export
 setMethod("addParam",
 	c(object = "SigexParam", ts_param = "SigexParamTS", Sigma = "matrix", rank = "ANY"),
@@ -64,6 +105,15 @@ setMethod("addParam",
 	}
 )
 
+#' setRegParam
+#'
+#' Set the vector of regression coefficients in a \code{SigexParam}.
+#'
+#' @slot object A \code{SigexParam} object.
+#' @slot beta A vector of regression coefficients.
+#'
+#' @return Returns \code{object} invisibly.
+#'
 #' @export
 setMethod("setRegParam",
 	c(object = "SigexParam", beta = "numeric"),
@@ -75,7 +125,15 @@ setMethod("setRegParam",
 )
 
 
-
+#' to_sigex
+#'
+#' Construct a \code{sigex} data structure for parameters from a
+#' \code{SigexParam}.
+#'
+#' @slot object A \code{SigexParam} object.
+#'
+#' @return A \code{sigex} data structure.
+#'
 #' @export
 setMethod("to_sigex",
 	c(object = "SigexParam"),
@@ -102,9 +160,19 @@ setMethod("to_sigex",
 	}
 )
 
-
-# We need to mdl as an input here to know the type of each component
-#    eg) arma, varma, etc
+#' asSigexParam
+#'
+#' Construct a \code{SigexParam} from a \code{sigex} data structure.
+#'
+#' @slot paramObject A \code{sigex} data structure representing parameters.
+#' @slot mdlObject A \code{sigex} data structure representing a model.
+#'
+#' @return A \code{SigexParam}.
+#'
+#' @details
+#' Note that \code{mdlObject} is needed to interpret the elements of
+#' \code{paramObject}.
+#'
 #' @export
 setMethod("asSigexParam",
     c(paramObject = "list", mdlObject = "list"),
@@ -125,19 +193,19 @@ setMethod("asSigexParam",
 			if(compTyp == 'arma'){
 				p <- compPar[1]
 				q <- compPar[2]
-				if(p == 0 & q == 0){
+				if (p == 0 & q == 0){
 					next
-				}else if (p == 0 & q > 0){
+				} else if (p == 0 & q > 0) {
 					maMat <- as.matrix(paramObject[[3]][[k]])
 					outSigexParam <- outSigexParam %>%
 						addParam(new("SigexParamARMA", ma = maMat),
 								 compGCD)
-				}else if (p > 0 & q == 0){
+				} else if (p > 0 & q == 0) {
 					arMat <- as.matrix(paramObject[[3]][[k]])
 					outSigexParam <- outSigexParam %>%
 						addParam(new("SigexParamARMA", ar = arMat),
 								 compGCD)
-				}else{
+				} else {
 					arMat <- as.matrix(paramObject[[3]][[k]][, 1:p])
 					maMat <- as.matrix(paramObject[[3]][[k]][, (p+1):(p+q)])
 					outSigexParam <- outSigexParam %>%
@@ -145,12 +213,12 @@ setMethod("asSigexParam",
 									                   ma = maMat),
 								 compGCD)
 				}
-			}else if (compTyp == "varma"){
+			} else if (compTyp == "varma"){
 				outSigexParam <- outSigexParam %>%
 					addParam(SigexParamVARMA(ar = paramObject[[3]][[k]][, ,1:compPar[1]],
 											 ma = paramObject[[3]][[k]][, ,(compPar[1] + 1):(compPar[1] + compPar[2])] ),
 							 compGCD)
-			}else{
+			} else {
 				msg <- paste("components of type", compTyp,
 								  "not yet supported in asSigexParam")
 				stop(msg)
@@ -161,7 +229,14 @@ setMethod("asSigexParam",
 	}
 )
 
-
+#' coef
+#'
+#' Print elements of the given \code{SigexParam}. (TBD: \code{show} also
+#' does this... maybe this can do something more like other R \code{coef}
+#' methods?)
+#'
+#' @slot object A \code{SigexParam} object.
+#'
 #' @export
 setMethod("coef",
 	c(object = "SigexParam"),
@@ -170,23 +245,23 @@ setMethod("coef",
 	}
 )
 
+#' component
+#'
+#' Retrieve a specified component of the \code{SigexParam} and return a new
+#' \code{SigexParam} with only this component.
+#'
+#' @slot object A \code{SigexParam} object.
+#' @slot index The desired index in \eqn{\{ 1, \ldots, K \}}.
+#'
 #' @export
 setMethod("component",
-		  c(object = "SigexParam", index = "numeric"),
-		  function(object, index){
-			  new("SigexParam",
-			      N = object@N,
-			  	  gcds = object@gcds[index],
-			  	  ts_params = object@ts_params[index],
-			  	  reg_param = object@reg_param[index]
-			  )
-		  }
+	c(object = "SigexParam", index = "numeric"),
+	function(object, index) {
+		new("SigexParam",
+			N = object@N,
+			gcds = object@gcds[index],
+			ts_params = object@ts_params[index],
+			reg_param = object@reg_param[index])
+	}
 )
-
-
-
-
-
-
-
 
