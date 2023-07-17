@@ -128,7 +128,7 @@ setMethod("asSigexModel",
 
 		  	outSigexModel <- SigexModel(N)
 
-		  	for(k in K){
+		  	for(k in 1:K){
 		  		compTyp <- mdlObject$type[[k]][[1]]
 		  		compPar <- mdlObject$type[[k]][[2]]
 		  		compEpi <- mdlObject$type[[k]][[4]]
