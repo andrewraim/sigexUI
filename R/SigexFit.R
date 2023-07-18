@@ -54,7 +54,14 @@ setMethod("show",
 		printf("optim_convergence_code = %d, lik = %f\n",
 			   optimOut$convergence, optimOut$value)
 		print("Parameter Estimates:")
-		print(object@param@ts_params)
+		K <- fit@param@ts_params |> length()
+		for(k in 1:K){
+			paramValue <- fit@param@ts_params[[k]]
+			paramEpithet <- fit@model@components[[k]] |> epithet()
+			printf("Component \"%s\":", paramEpithet)
+			print(paramValue)
+		}
+
 })
 
 
