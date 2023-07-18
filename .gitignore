@@ -39,3 +39,4 @@ vignettes/*.pdf
 .Renviron
 inst/slides/fit.RData
 inst/slides/fitmle.RData
+*.html
