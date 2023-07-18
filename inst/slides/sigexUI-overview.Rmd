@@ -12,7 +12,7 @@ editor_options:
 ---
 
 ```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE)
+knitr::opts_chunk$set(echo = TRUE, warning = FALSE, message = FALSE)
 ```
 
 ```{r libs, echo=FALSE}
@@ -52,8 +52,8 @@ Following feedback from JSS and other users we aim to make `sigex` fit more
 seamlessly into the R ecosystem.
 
 - User friendly defaults
-- Error/wanrining checks
-- Esstablished R function support
+- Error/warning checks
+- Established R function support
 	* `residuals()`
 	* `summary()`
 	* `print()`
@@ -84,7 +84,7 @@ S4 Class
 
 - objects have a proper definition 
 - gives proper structure to its objects
-- **We will be implimenting S4 classes in SigexUI**
+- **We will be implementing S4 classes in SigexUI**
 
 
 ################################################################################
@@ -101,7 +101,7 @@ class(fit)
 ## Example: fitting ARIMA model
 
 The R ecosystem and its users is now familiar with the concepts of `fit` being
-the output of a model and with that comes ceritain expectations about how it should 
+the output of a model and with that comes certain expectations about how it should 
 behave. For example,
 
 ```{r, collapse=TRUE}
@@ -155,7 +155,7 @@ method dispatch for class *Arima* starts at line 373.
 		1. name: an alpha-numeric string that identifies the class
 		1. representation/slots: a list of attributes, giving their names and classes
 		1. contains: character vector of classes that it inherits from
-- **Object** instances of a class created with specifically defined data. Objects can correspond to real-world objects or an abstract entity.
+- **Object** instances of a class created with specifically defined data. 
 - **Generic Function** Function that dispatches to a method depending on the input class
 - **Methods** Function that acts upon specific input class
 
@@ -202,15 +202,15 @@ A SigexParam has three things:
 #' @export
 setClass("SigexParam",
 	slots = c(
-		N = "numeric", # Used to be integer but floating pt arithmetic issues
+		N = "numeric", 
 		gcds = "list",
 		ts_params = "list",
 		reg_param = "numeric"
-	),#
+	),
 	prototype = list(
 		N = NA_integer_,
-	#	gcd_list = list(),
-	#	ts_param_list = NA_real_,
+	 	gcd_list = list(),
+		ts_param_list = NA_real_,
 		reg_param = NA_real_
 	)
 )
@@ -239,7 +239,7 @@ setClass("SigexParamVARMA",
 ## Model class
 
 The components slot is a list of time series components which themselves are a class.
-This allows flexibility when printing, error checking, etc each individial component.
+This allows flexibility when printing, error checking, etc each individual component.
 
 ```{r, eval=FALSE}
 #' @export
@@ -386,7 +386,7 @@ print(param)
 
 ## S4 method dispatch
 
-`to_sigex()` generic fucntion that converts any object to *sigex* style
+`to_sigex()` generic function that converts any object to *sigex* style
 
 ```{r, eval=FALSE}
 to_sigex(SigexModel)
@@ -636,24 +636,25 @@ lik(myfit)
 plot(resid(myfit))
 ```
 
-
+################################################################################
 ## Left to be decided
 
-Easy Decisions 
+### Easy Decisions 
+
 - What output to display by default for each class
-- 
+- Which model components to develop and test
 
 
-More Delicate Decisions 
+### More Delicate Decisions 
 
 - handling matrix vs numeric vector input 
-	* should work seemlessly for univariate fits
-- Decide how to handle AR/MA coefs and matricies for ARMA/VARMA class
+	* should work seamlessly for univariate fits
+- Decide how to handle AR/MA coefs and matrices for ARMA/VARMA class
 	* this is a major source of coding headache
 	* currently, almost need to go case by case 
-		- p > 0, q > 0
-		- p > 0, q = 0
-		- p = 0 , q > 0 
+- Do we want to add a *control object* that we pass around?
+	* would require modifying sigex code
+- How to make $\eta$, $\psi$, par feel natural to users in UI
 
 
 
