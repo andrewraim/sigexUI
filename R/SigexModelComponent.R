@@ -13,7 +13,8 @@ setMethod("show", "SigexModelComponent", function(object) {
 		printf("SigexModelComponent: model_class = %s, delta = (%s)\n",
 			object@model_class, paste(object@delta, collapse = ","))
 	} else {
-		printf("SigexModelComponent: model_class = %s, epithet = \"%s\", delta = (%s)\n",
-			object@model_class, object@epithet, paste(object@delta, collapse = ","))
+		# printf("SigexModelComponent: model_class = %s, epithet = \"%s\", delta = (%s)\n",
+			   printf("%s(%s), \"%s\", delta = (%s)\n",
+			object@model_class, paste(orderVector(object), collapse = ","), object@epithet, paste(object@delta, collapse = ","))
 	}
 })
