@@ -184,8 +184,8 @@ setMethod("asSigexParam",
 		outSigexParam <- SigexParam(N)
 
 		for(k in 1:K){
-			compTyp <- mdlObject$type[[k]][[1]]
-			compPar <- mdlObject$type[[k]][[2]]
+			compTyp <- mdlObject[[2]][[k]][[1]]
+			compPar <- mdlObject[[2]][[k]][[2]]
 			compGCD = GCD(L = paramObject[[1]][[k]],
 						  D_vec = paramObject[[2]][[k]])
 
@@ -194,25 +194,22 @@ setMethod("asSigexParam",
 				p <- compPar[1]
 				q <- compPar[2]
 				if (p == 0 & q == 0){
-					next
+					arMat <- matrix(NA, nrow = N, ncol = 0)
+					maMat <- matrix(NA, nrow = N, ncol = 0)
 				} else if (p == 0 & q > 0) {
+					arMat <- matrix(NA, nrow = N, ncol = 0)
 					maMat <- as.matrix(paramObject[[3]][[k]])
-					outSigexParam <- outSigexParam %>%
-						addParam(new("SigexParamARMA", ma = maMat),
-								 compGCD)
 				} else if (p > 0 & q == 0) {
 					arMat <- as.matrix(paramObject[[3]][[k]])
-					outSigexParam <- outSigexParam %>%
-						addParam(new("SigexParamARMA", ar = arMat),
-								 compGCD)
+					maMat <- matrix(NA, nrow = N, ncol = 0)
 				} else {
 					arMat <- as.matrix(paramObject[[3]][[k]][, 1:p])
 					maMat <- as.matrix(paramObject[[3]][[k]][, (p+1):(p+q)])
-					outSigexParam <- outSigexParam %>%
-						addParam(new("SigexParamARMA", ar = arMat,
-									                   ma = maMat),
-								 compGCD)
 				}
+				# add component output list
+				outSigexParam <- outSigexParam %>%
+					addParam(new("SigexParamARMA", ar = arMat, ma = maMat),
+							 compGCD)
 			} else if (compTyp == "varma"){
 				outSigexParam <- outSigexParam %>%
 					addParam(SigexParamVARMA(ar = paramObject[[3]][[k]][, ,1:compPar[1]],
