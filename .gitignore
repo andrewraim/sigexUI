@@ -40,3 +40,4 @@ vignettes/*.pdf
 inst/slides/fit.RData
 inst/slides/fitmle.RData
 *.html
+*.log
