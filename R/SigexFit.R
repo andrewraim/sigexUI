@@ -27,14 +27,14 @@ SigexMLE <- function(model, data.ts, SigexParam = NULL){
 						   method = "bfgs",
 						   debug = TRUE)
 	et = Sys.time()
-	run_time <- as.numeric(et - st, units = "secs")
+	run_time <- as.numeric(et - st, units = "mins")
 
 	paramEst <- asSigexParam(fit.mle[[2]], mdl)
 
 	out <- new("SigexFit",
 			   optimOut = fit.mle[[1]],
 			   param = paramEst,
-			   data = data.ts,
+			   data = as.matrix(data.ts),
 			   model = model)
 
 	return(out)
