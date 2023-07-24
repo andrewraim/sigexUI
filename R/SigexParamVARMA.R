@@ -35,12 +35,20 @@ setMethod("show", "SigexParamVARMA", function(object) {
 	N = dim(object@ar)[1]
 	p = dim(object@ar)[3]
 	q = dim(object@ma)[3]
-	printf("--- Param for N=%d dimensional VARMA(%d,%d) series ---\n", N, p, q)
-	printf("ar:\n")
-	print(object@ar)
-	printf("\n")
-	printf("ma:\n")
-	print(object@ma)
+	if(p == 0 & q > 0){
+		printf("--- %d-dimensional VMA(%d) ---\n", N, q)
+		print(object@ma)
+	}else if(p > 0 & q == 0){
+		printf("--- %d-dimensional VAR(%d) ---\n", N, p)
+		print(object@ar)
+	}else{
+		printf("--- %d-dimensional VARMA(%d,%d) ---\n", N, p, q)
+		printf("ar:\n")
+		print(object@ar)
+		printf("\n")
+		printf("ma:\n")
+		print(object@ma)
+	}
 })
 
 #' @export

@@ -19,12 +19,20 @@ setMethod("modelClass", "SigexParamARMA", function(object) {
 setMethod("show", "SigexParamARMA", function(object) {
 	p = dim(object@ar)[2]
 	q = dim(object@ma)[2]
-	printf("--- Param for ARMA(%d,%d) ---\n", p, q)
-	printf("ar:\n")
-	print(object@ar)
-	printf("\n")
-	printf("ma:\n")
-	print(object@ma)
+	if(p == 0 & q > 0){
+		printf("--- MA(%d) ---\n", q)
+		print(object@ma)
+	}else if(p > 0 & q == 0){
+		printf("--- AR(%d) ---\n", p)
+		print(object@ar)
+	}else{
+		printf("--- Param for ARMA(%d,%d) ---\n", p, q)
+		printf("ar:\n")
+		print(object@ar)
+		printf("\n")
+		printf("ma:\n")
+		print(object@ma)
+	}
 })
 
 #' @export
