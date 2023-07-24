@@ -96,3 +96,22 @@ setMethod("lik",
 
 		return(likOut)
 })
+
+
+setMethod("fitted",
+	c(object = "SigexFit"),
+	function(object){
+
+		param <- to_sigex(object)
+
+
+
+
+
+})
+
+
+
+
+
+
