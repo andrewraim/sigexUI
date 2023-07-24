@@ -36,6 +36,9 @@ setMethod("show", "GCD", function(object) {
 	printf("\n")
 	printf("Diagonal of D:\n")
 	print(object@D_vec)
+	printf("\n")
+	printf("L * D * t(L) = \n")
+	print(object@L %*% diag(object@D_vec) %*% t(object@L))
 })
 
 #' @export
