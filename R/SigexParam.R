@@ -183,17 +183,17 @@ setMethod("asSigexParam",
 
 		outSigexParam <- SigexParam(N)
 
-		for(k in 1:K){
+		for (k in 1:K) {
 			compTyp <- mdlObject[[2]][[k]][[1]]
 			compPar <- mdlObject[[2]][[k]][[2]]
 			compGCD = GCD(L = paramObject[[1]][[k]],
 						  D_vec = paramObject[[2]][[k]])
 
 			# Switch to decide on type
-			if(compTyp == 'arma'){
+			if (compTyp == 'arma') {
 				p <- compPar[1]
 				q <- compPar[2]
-				if (p == 0 & q == 0){
+				if (p == 0 & q == 0) {
 					arMat <- matrix(NA, nrow = N, ncol = 0)
 					maMat <- matrix(NA, nrow = N, ncol = 0)
 				} else if (p == 0 & q > 0) {
@@ -204,20 +204,38 @@ setMethod("asSigexParam",
 					maMat <- matrix(NA, nrow = N, ncol = 0)
 				} else {
 					arMat <- as.matrix(paramObject[[3]][[k]][, 1:p])
-					maMat <- as.matrix(paramObject[[3]][[k]][, (p+1):(p+q)])
+					maMat <- as.matrix(paramObject[[3]][[k]][, (p + 1):(p + q)])
 				}
 				# add component output list
 				outSigexParam <- outSigexParam %>%
 					addParam(new("SigexParamARMA", ar = arMat, ma = maMat),
 							 compGCD)
-			} else if (compTyp == "varma"){
+			} else if (compTyp == "varma") {
+				p <- compPar[1]
+				q <- compPar[2]
+				if (p == 0 & q == 0) {
+					arArr <- array(NA, c(N, N, 0))
+					maArr <- array(NA, c(N, N, 0))
+				} else if (p == 0 & q > 0) {
+					arArr <- array(NA, c(N, N, 0))
+					maArr <- paramObject[[3]][[k]]
+				} else if (p > 0 & q == 0) {
+					arArr <- paramObject[[3]][[k]]
+					maArr <- array(NA, c(N, N, 0))
+				} else {
+					arArr <- paramObject[[3]][[k]][, 1:p]
+					maArr <- paramObject[[3]][[k]][, (p + 1):(p + q)]
+				}
+				# add component output list
 				outSigexParam <- outSigexParam %>%
-					addParam(SigexParamVARMA(ar = paramObject[[3]][[k]][, ,1:compPar[1]],
-											 ma = paramObject[[3]][[k]][, ,(compPar[1] + 1):(compPar[1] + compPar[2])] ),
+					addParam(new("SigexParamVARMA",
+								 ar = arArr,
+								 ma = maArr),
 							 compGCD)
 			} else {
-				msg <- paste("components of type", compTyp,
-								  "not yet supported in asSigexParam")
+				msg <- paste("components of type",
+							 compTyp,
+							 "not yet supported in asSigexParam")
 				stop(msg)
 			}
 		}
